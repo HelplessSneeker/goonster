@@ -7,29 +7,30 @@ interface PauseFlashProps {
 export default function PauseFlash({ isPlaying }: PauseFlashProps) {
   const [showIcon, setShowIcon] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [icon, setIcon] = useState<'play' | 'pause'>('pause')
   const prevPlayingRef = useRef<boolean | null>(null)
 
   useEffect(() => {
-    // Trigger only on transition from playing to paused (not on initial load)
-    if (prevPlayingRef.current === true && isPlaying === false) {
+    const prev = prevPlayingRef.current
+    prevPlayingRef.current = isPlaying
+
+    // Skip initial mount
+    if (prev === null) return
+
+    // Trigger on any play/pause transition
+    if (prev !== isPlaying) {
+      setIcon(isPlaying ? 'play' : 'pause')
       setShowIcon(true)
       setVisible(true)
 
-      // Hold at opacity 1 for 500ms, then begin fade
       const fadeTimer = setTimeout(() => setVisible(false), 500)
-
-      // Remove from DOM after fade completes (500ms hold + 300ms fade = 800ms)
       const removeTimer = setTimeout(() => setShowIcon(false), 800)
-
-      prevPlayingRef.current = isPlaying
 
       return () => {
         clearTimeout(fadeTimer)
         clearTimeout(removeTimer)
       }
     }
-
-    prevPlayingRef.current = isPlaying
   }, [isPlaying])
 
   if (!showIcon) return null
@@ -43,7 +44,11 @@ export default function PauseFlash({ isPlaying }: PauseFlashProps) {
           transition: 'opacity 300ms',
         }}
       >
-        <span className="text-white text-4xl ml-1">&#9654;</span>
+        {icon === 'play' ? (
+          <span className="text-white text-4xl ml-1">&#9654;</span>
+        ) : (
+          <span className="text-white text-4xl">&#9646;&#9646;</span>
+        )}
       </div>
     </div>
   )
