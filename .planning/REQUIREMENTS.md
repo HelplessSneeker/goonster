@@ -9,12 +9,12 @@ Requirements for initial release (Milestone 1: Static Video Player).
 
 ### Video Playback
 
-- [ ] **PLAY-01**: Video plays fullscreen in vertical (9:16) format with `object-fit: cover`
+- [x] **PLAY-01**: Video plays fullscreen in vertical (9:16) format with `object-fit: cover`
 - [ ] **PLAY-02**: First video autoplays muted on page load without user interaction
-- [ ] **PLAY-03**: User can mute/unmute via a visible, persistent control on the video overlay
+- [x] **PLAY-03**: User can mute/unmute via a visible, persistent control on the video overlay
 - [ ] **PLAY-04**: User can tap the video body to toggle play/pause
 - [ ] **PLAY-05**: Video loops automatically when it reaches the end
-- [ ] **PLAY-06**: Thin progress bar overlay shows elapsed time on the current video
+- [x] **PLAY-06**: Thin progress bar overlay shows elapsed time on the current video
 
 ### Feed Navigation
 
@@ -36,7 +36,7 @@ Requirements for initial release (Milestone 1: Static Video Player).
 
 - [ ] **MOBL-01**: App uses `100dvh` with `-webkit-fill-available` fallback for correct mobile viewport
 - [ ] **MOBL-02**: All `<video>` elements include `playsinline` attribute for iOS Safari compatibility
-- [ ] **MOBL-03**: Layout and controls are optimized for mobile-first touch interaction
+- [x] **MOBL-03**: Layout and controls are optimized for mobile-first touch interaction
 - [ ] **MOBL-04**: Only one video plays at a time (respects iOS single-video hardware constraint)
 
 ## v2 Requirements
@@ -84,12 +84,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAY-01 | Phase 2 | Pending |
+| PLAY-01 | Phase 2 | Complete |
 | PLAY-02 | Phase 2 | Pending |
-| PLAY-03 | Phase 2 | Pending |
+| PLAY-03 | Phase 2 | Complete |
 | PLAY-04 | Phase 2 | Pending |
 | PLAY-05 | Phase 2 | Pending |
-| PLAY-06 | Phase 2 | Pending |
+| PLAY-06 | Phase 2 | Complete |
 | FEED-01 | Phase 3 | Pending |
 | FEED-02 | Phase 3 | Pending |
 | FEED-03 | Phase 3 | Pending |
@@ -102,7 +102,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | API-04 | Phase 1 | Complete |
 | MOBL-01 | Phase 2 | Pending |
 | MOBL-02 | Phase 2 | Pending |
-| MOBL-03 | Phase 2 | Pending |
+| MOBL-03 | Phase 2 | Complete |
 | MOBL-04 | Phase 2 | Pending |
 
 **Coverage:**
