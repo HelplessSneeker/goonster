@@ -12,13 +12,12 @@ A vertical-swipe video feed that plays content your friends chose to share — n
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Backend serves static video files via API — Validated in Phase 01: backend-foundation (HTTP 206 range requests, @fastify/static)
 
 ### Active
 
 - [ ] Mobile-first web app with vertical swipe video feed
 - [ ] Full-screen autoplay and loop for short-form videos
-- [ ] Backend serves static video files via API
 - [ ] Smooth swipe-to-next navigation between videos
 - [ ] Responsive design optimized for mobile viewports
 
@@ -50,9 +49,9 @@ A vertical-swipe video feed that plays content your friends chose to share — n
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Node/TypeScript backend | User preference, JS everywhere | — Pending |
+| Node/TypeScript backend | User preference, JS everywhere | ✓ Fastify 5 + TypeScript monorepo |
 | Mobile framework deferred | Research needed, not blocking m1 | — Pending |
-| Static files for m1 | Simplify scope, focus on player UX | — Pending |
+| Static files for m1 | Simplify scope, focus on player UX | ✓ DiskVideoStore + fixtures |
 | No algorithm by design | Core product differentiator — friend-curated feed | — Pending |
 
 ## Evolution
@@ -73,4 +72,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after initialization*
+*Last updated: 2026-04-01 after Phase 01 completion*
