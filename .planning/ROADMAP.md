@@ -42,7 +42,11 @@ Plans:
   3. A mute/unmute button is visible on the video; tapping it toggles audio; tapping the video body pauses and resumes playback
   4. The video loops seamlessly when it ends; a thin progress bar at the bottom shows elapsed time throughout
   5. Only one video element ever plays at a time (verified by checking the iOS single-video hardware constraint is not violated)
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Frontend scaffold (Vite + React 19 + Tailwind 4), hooks (useVideoPlayer, useVideoProgress), feed API client
+- [ ] 02-02-PLAN.md — VideoPlayer component tree (MuteButton, ProgressBar, PauseFlash), App wiring, component tests
+- [ ] 02-03-PLAN.md — Human verification checkpoint: browser and mobile device testing
 **UI hint**: yes
 
 ### Phase 3: Feed & Navigation
@@ -65,5 +69,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Backend Foundation | 2/2 | Complete   | 2026-04-01 |
-| 2. Video Player Core | 0/TBD | Not started | - |
+| 2. Video Player Core | 0/3 | Not started | - |
 | 3. Feed & Navigation | 0/TBD | Not started | - |
