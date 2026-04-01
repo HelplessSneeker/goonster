@@ -1,0 +1,29 @@
+[
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567801",
+    "filename": "placeholder-01.mp4",
+    "title": "Placeholder Video 1",
+    "duration": 3,
+    "mimeType": "video/mp4",
+    "size": 5995,
+    "sourcePlatform": "local"
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567802",
+    "filename": "placeholder-02.mp4",
+    "title": "Placeholder Video 2",
+    "duration": 3,
+    "mimeType": "video/mp4",
+    "size": 6001,
+    "sourcePlatform": "local"
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567803",
+    "filename": "placeholder-03.mp4",
+    "title": "Placeholder Video 3",
+    "duration": 3,
+    "mimeType": "video/mp4",
+    "size": 6000,
+    "sourcePlatform": "local"
+  }
+]
