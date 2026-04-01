@@ -29,8 +29,8 @@ Requirements for initial release (Milestone 1: Static Video Player).
 
 - [ ] **API-01**: Server responds to video requests with HTTP 206 partial content (range requests)
 - [ ] **API-02**: Feed endpoint returns paginated list of available videos with metadata
-- [ ] **API-03**: Feed pagination uses cursor-based approach (stable when videos are added)
-- [ ] **API-04**: Storage layer uses an abstraction interface (disk now, cloud-swappable later)
+- [x] **API-03**: Feed pagination uses cursor-based approach (stable when videos are added)
+- [x] **API-04**: Storage layer uses an abstraction interface (disk now, cloud-swappable later)
 
 ### Mobile Experience
 
@@ -98,8 +98,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FEED-06 | Phase 3 | Pending |
 | API-01 | Phase 1 | Pending |
 | API-02 | Phase 1 | Pending |
-| API-03 | Phase 1 | Pending |
-| API-04 | Phase 1 | Pending |
+| API-03 | Phase 1 | Complete |
+| API-04 | Phase 1 | Complete |
 | MOBL-01 | Phase 2 | Pending |
 | MOBL-02 | Phase 2 | Pending |
 | MOBL-03 | Phase 2 | Pending |
