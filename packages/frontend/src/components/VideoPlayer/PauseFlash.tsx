@@ -21,6 +21,8 @@ export default function PauseFlash({ isPlaying }: PauseFlashProps) {
       // Remove from DOM after fade completes (500ms hold + 300ms fade = 800ms)
       const removeTimer = setTimeout(() => setShowIcon(false), 800)
 
+      prevPlayingRef.current = isPlaying
+
       return () => {
         clearTimeout(fadeTimer)
         clearTimeout(removeTimer)
@@ -29,11 +31,6 @@ export default function PauseFlash({ isPlaying }: PauseFlashProps) {
 
     prevPlayingRef.current = isPlaying
   }, [isPlaying])
-
-  // Update prevPlayingRef on every render after the effect runs
-  useEffect(() => {
-    prevPlayingRef.current = isPlaying
-  })
 
   if (!showIcon) return null
 
