@@ -12,7 +12,7 @@ Three phases that build in strict dependency order: backend first (serve video f
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Backend Foundation** - Node/TypeScript server with HTTP 206 video streaming and cursor-paginated feed API
+- [x] **Phase 1: Backend Foundation** - Node/TypeScript server with HTTP 206 video streaming and cursor-paginated feed API (completed 2026-04-01)
 - [ ] **Phase 2: Video Player Core** - Single-video player component with all iOS Safari constraints addressed
 - [ ] **Phase 3: Feed & Navigation** - Vertical swipe feed with preloading, buffering indicators, and end-of-feed state
 
@@ -29,8 +29,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Swapping from the disk `VideoStore` to a mock implementation requires no changes to route handlers
 **Plans**: 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Monorepo scaffold, shared types, VideoStore interface, DiskVideoStore, feedService, fixtures
-- [ ] 01-02-PLAN.md — Fastify server, HTTP routes, integration tests for 206 streaming and feed pagination
+- [x] 01-01-PLAN.md — Monorepo scaffold, shared types, VideoStore interface, DiskVideoStore, feedService, fixtures
+- [x] 01-02-PLAN.md — Fastify server, HTTP routes, integration tests for 206 streaming and feed pagination
 
 ### Phase 2: Video Player Core
 **Goal**: A single video plays fullscreen in vertical format on a real mobile device with correct iOS Safari behavior — mute control visible, tap-to-pause working, loop continuous, progress bar showing
@@ -64,6 +64,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Backend Foundation | 0/2 | Planning complete | - |
+| 1. Backend Foundation | 2/2 | Complete   | 2026-04-01 |
 | 2. Video Player Core | 0/TBD | Not started | - |
 | 3. Feed & Navigation | 0/TBD | Not started | - |

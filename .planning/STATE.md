@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-04-01T09:40:37.498Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-04-01T09:46:45.990Z"
 last_activity: 2026-04-01 — Roadmap created; 20/20 v1 requirements mapped across 3 phases
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 2
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 4 | 2 tasks | 16 files |
+| Phase 01 P02 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Recent decisions affecting current work:
 - [Phase 01]: pnpm workspaces selected over Turborepo — 3-package monorepo scope doesn't need build graph
 - [Phase 01]: Cursor encodes last-seen video ID (not offset) via base64url — insertion-stable pagination confirmed by unit tests
 - [Phase 01]: TypeScript 6.0.2 and Vitest 4.1.2 used (newer than CLAUDE.md versions) per research confirmation
+- [Phase 01]: buildApp factory with overrides?.store enables store injection for tests without route handler changes (API-04)
+- [Phase 01]: fileURLToPath(import.meta.url) used over import.meta.dirname — Node16 ESM compatibility
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T09:40:37.495Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-04-01T09:46:45.987Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
