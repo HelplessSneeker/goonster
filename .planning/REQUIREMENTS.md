@@ -84,32 +84,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAY-01 | Pending | Pending |
-| PLAY-02 | Pending | Pending |
-| PLAY-03 | Pending | Pending |
-| PLAY-04 | Pending | Pending |
-| PLAY-05 | Pending | Pending |
-| PLAY-06 | Pending | Pending |
-| FEED-01 | Pending | Pending |
-| FEED-02 | Pending | Pending |
-| FEED-03 | Pending | Pending |
-| FEED-04 | Pending | Pending |
-| FEED-05 | Pending | Pending |
-| FEED-06 | Pending | Pending |
-| API-01 | Pending | Pending |
-| API-02 | Pending | Pending |
-| API-03 | Pending | Pending |
-| API-04 | Pending | Pending |
-| MOBL-01 | Pending | Pending |
-| MOBL-02 | Pending | Pending |
-| MOBL-03 | Pending | Pending |
-| MOBL-04 | Pending | Pending |
+| PLAY-01 | Phase 2 | Pending |
+| PLAY-02 | Phase 2 | Pending |
+| PLAY-03 | Phase 2 | Pending |
+| PLAY-04 | Phase 2 | Pending |
+| PLAY-05 | Phase 2 | Pending |
+| PLAY-06 | Phase 2 | Pending |
+| FEED-01 | Phase 3 | Pending |
+| FEED-02 | Phase 3 | Pending |
+| FEED-03 | Phase 3 | Pending |
+| FEED-04 | Phase 3 | Pending |
+| FEED-05 | Phase 3 | Pending |
+| FEED-06 | Phase 3 | Pending |
+| API-01 | Phase 1 | Pending |
+| API-02 | Phase 1 | Pending |
+| API-03 | Phase 1 | Pending |
+| API-04 | Phase 1 | Pending |
+| MOBL-01 | Phase 2 | Pending |
+| MOBL-02 | Phase 2 | Pending |
+| MOBL-03 | Phase 2 | Pending |
+| MOBL-04 | Phase 2 | Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20 ⚠️
+- Mapped to phases: 20
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-01 after initial definition*
+*Last updated: 2026-04-01 after roadmap creation*
