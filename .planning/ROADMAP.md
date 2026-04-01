@@ -27,7 +27,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. `GET /feed` returns a paginated list of video metadata and a cursor that produces the next page on repeat calls
   3. Inserting a new video file does not break pagination for an in-progress session (cursor stability)
   4. Swapping from the disk `VideoStore` to a mock implementation requires no changes to route handlers
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Monorepo scaffold, shared types, VideoStore interface, DiskVideoStore, feedService, fixtures
+- [ ] 01-02-PLAN.md — Fastify server, HTTP routes, integration tests for 206 streaming and feed pagination
 
 ### Phase 2: Video Player Core
 **Goal**: A single video plays fullscreen in vertical format on a real mobile device with correct iOS Safari behavior — mute control visible, tap-to-pause working, loop continuous, progress bar showing
@@ -61,6 +64,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Backend Foundation | 0/TBD | Not started | - |
+| 1. Backend Foundation | 0/2 | Planning complete | - |
 | 2. Video Player Core | 0/TBD | Not started | - |
 | 3. Feed & Navigation | 0/TBD | Not started | - |
