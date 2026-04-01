@@ -1,0 +1,10 @@
+{
+  "name": "goonster",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:backend": "pnpm --filter backend dev",
+    "test": "pnpm --filter backend test --run",
+    "typecheck": "pnpm -r run typecheck"
+  }
+}

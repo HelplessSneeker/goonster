@@ -1,0 +1,16 @@
+{
+  "name": "@goonster/shared",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/types/video.ts",
+  "types": "./src/types/video.ts",
+  "exports": {
+    ".": "./src/types/video.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}

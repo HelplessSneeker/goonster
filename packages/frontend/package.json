@@ -1,0 +1,8 @@
+{
+  "name": "@goonster/frontend",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@goonster/shared": "workspace:*"
+  }
+}
