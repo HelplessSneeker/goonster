@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchFeed } from './api/feedApi'
+import { VideoPlayer } from './components/VideoPlayer'
 
 export default function App() {
   const { data, isLoading, error } = useQuery({
@@ -37,10 +38,5 @@ export default function App() {
     )
   }
 
-  // VideoPlayer component wired in Plan 02
-  return (
-    <div className="fullscreen-container bg-black flex items-center justify-center">
-      <span className="text-white text-base">Video: {video.title}</span>
-    </div>
-  )
+  return <VideoPlayer video={video} />
 }
