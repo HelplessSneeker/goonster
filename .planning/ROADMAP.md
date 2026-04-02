@@ -46,7 +46,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Frontend scaffold (Vite + React 19 + Tailwind 4), hooks (useVideoPlayer, useVideoProgress), feed API client
 - [x] 02-02-PLAN.md — VideoPlayer component tree (MuteButton, ProgressBar, PauseFlash), App wiring, component tests
-- [ ] 02-03-PLAN.md — Human verification checkpoint: browser and mobile device testing
+- [x] 02-03-PLAN.md — Human verification checkpoint: browser and mobile device testing
 **UI hint**: yes
 
 ### Phase 3: Feed & Navigation
@@ -58,7 +58,11 @@ Plans:
   2. The next video begins playing with no perceptible gap after a swipe (preload is in effect)
   3. A loading indicator appears when a video is buffering and disappears when playback begins
   4. After the last video, the screen shows "You've seen everything" and no further swipes advance
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Install swiper+zustand, create feedStore, upgrade feedApi to cursor pagination, create useFeed hook, refactor useVideoPlayer mute state
+- [ ] 03-02-PLAN.md — Feed components (FeedContainer, FeedSlide, BufferingSpinner, EndOfFeedSlide), App.tsx wiring, component tests
+- [ ] 03-03-PLAN.md — Human verification checkpoint: desktop and mobile device testing
 **UI hint**: yes
 
 ## Progress
@@ -70,4 +74,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Backend Foundation | 2/2 | Complete   | 2026-04-01 |
 | 2. Video Player Core | 2/3 | In Progress|  |
-| 3. Feed & Navigation | 0/TBD | Not started | - |
+| 3. Feed & Navigation | 0/3 | Not started | - |
