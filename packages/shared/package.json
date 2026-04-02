@@ -5,7 +5,8 @@
   "main": "./src/types/video.ts",
   "types": "./src/types/video.ts",
   "exports": {
-    ".": "./src/types/video.ts"
+    ".": "./src/types/video.ts",
+    "./auth": "./src/types/auth.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

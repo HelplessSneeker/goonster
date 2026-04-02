@@ -8,6 +8,7 @@ export default defineConfig({
     proxy: {
       '/feed': 'http://localhost:3000',
       '/video': 'http://localhost:3000',
+      '/api': 'http://localhost:3000',
     },
   },
 })
