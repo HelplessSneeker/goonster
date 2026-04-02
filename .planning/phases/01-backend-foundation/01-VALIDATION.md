@@ -1,10 +1,11 @@
 ---
 phase: 1
 slug: backend-foundation
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-01
+validated: 2026-04-02
 ---
 
 # Phase 1 — Validation Strategy
@@ -38,14 +39,14 @@ created: 2026-04-01
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 01-01-01 | 01 | 1 | API-01 | integration | `pnpm --filter backend test --run tests/video.test.ts` | ❌ W0 | ⬜ pending |
-| 01-01-02 | 01 | 1 | API-01 | integration | `pnpm --filter backend test --run tests/video.test.ts` | ❌ W0 | ⬜ pending |
-| 01-02-01 | 02 | 1 | API-02 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ❌ W0 | ⬜ pending |
-| 01-02-02 | 02 | 1 | API-02 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ❌ W0 | ⬜ pending |
-| 01-03-01 | 03 | 1 | API-03 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ❌ W0 | ⬜ pending |
-| 01-03-02 | 03 | 1 | API-03 | unit | `pnpm --filter backend test --run tests/feedService.test.ts` | ❌ W0 | ⬜ pending |
-| 01-04-01 | 04 | 1 | API-04 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ❌ W0 | ⬜ pending |
-| 01-04-02 | 04 | 1 | API-04 | unit | `pnpm --filter backend test --run tests/DiskVideoStore.test.ts` | ❌ W0 | ⬜ pending |
+| 01-01-01 | 01 | 1 | API-01 | integration | `pnpm --filter backend test --run tests/video.test.ts` | ✅ | ✅ green |
+| 01-01-02 | 01 | 1 | API-01 | integration | `pnpm --filter backend test --run tests/video.test.ts` | ✅ | ✅ green |
+| 01-02-01 | 02 | 1 | API-02 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ✅ | ✅ green |
+| 01-02-02 | 02 | 1 | API-02 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ✅ | ✅ green |
+| 01-03-01 | 03 | 1 | API-03 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ✅ | ✅ green |
+| 01-03-02 | 03 | 1 | API-03 | unit | `pnpm --filter backend test --run tests/feedService.test.ts` | ✅ | ✅ green |
+| 01-04-01 | 04 | 1 | API-04 | integration | `pnpm --filter backend test --run tests/feed.test.ts` | ✅ | ✅ green |
+| 01-04-02 | 04 | 1 | API-04 | unit | `pnpm --filter backend test --run tests/DiskVideoStore.test.ts` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -53,13 +54,13 @@ created: 2026-04-01
 
 ## Wave 0 Requirements
 
-- [ ] `packages/backend/vitest.config.ts` — test config
-- [ ] `packages/backend/tests/video.test.ts` — API-01 HTTP 206 coverage
-- [ ] `packages/backend/tests/feed.test.ts` — API-02, API-03, API-04 coverage
-- [ ] `packages/backend/tests/feedService.test.ts` — cursor stability unit tests
-- [ ] `packages/backend/tests/DiskVideoStore.test.ts` — store unit tests
-- [ ] `packages/backend/tests/fixtures/MockVideoStore.ts` — shared test helper
-- [ ] Framework install: `pnpm add -D vitest @vitest/coverage-v8`
+- [x] `packages/backend/vitest.config.ts` — test config
+- [x] `packages/backend/tests/video.test.ts` — API-01 HTTP 206 coverage (4 tests)
+- [x] `packages/backend/tests/feed.test.ts` — API-02, API-03, API-04 coverage (8 tests)
+- [x] `packages/backend/tests/feedService.test.ts` — cursor stability unit tests (9 tests)
+- [x] `packages/backend/tests/DiskVideoStore.test.ts` — store unit tests (7 tests)
+- [x] `packages/backend/tests/fixtures/MockVideoStore.ts` — shared test helper
+- [x] Framework install: `pnpm add -D vitest @vitest/coverage-v8`
 
 ---
 
@@ -71,11 +72,23 @@ created: 2026-04-01
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 5s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 5s (419ms actual)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** complete (2026-04-02)
+
+---
+
+## Validation Audit 2026-04-02
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+**28 tests across 4 files, all green. Full Nyquist compliance — no auditor agent needed.**
