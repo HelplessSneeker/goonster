@@ -1,0 +1,1 @@
+- [Desktop rendering deferred](project_desktop_rendering.md) — video broken on desktop, fix in phase 04/05
