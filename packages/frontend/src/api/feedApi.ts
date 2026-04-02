@@ -5,8 +5,10 @@ export interface FeedResponse {
   meta: { total: number }
 }
 
-export async function fetchFeed(limit = 1): Promise<FeedResponse> {
-  const res = await fetch(`/feed?limit=${limit}`)
+export async function fetchFeed({ cursor, limit }: { cursor: string | null; limit: number }): Promise<FeedResponse> {
+  const params = new URLSearchParams({ limit: String(limit) })
+  if (cursor) params.set('cursor', cursor)
+  const res = await fetch(`/feed?${params}`)
   if (!res.ok) throw new Error(`Feed fetch failed: ${res.status}`)
   return res.json() as Promise<FeedResponse>
 }

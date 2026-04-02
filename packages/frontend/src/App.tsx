@@ -5,7 +5,7 @@ import { VideoPlayer } from './components/VideoPlayer'
 export default function App() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['feed', 1],
-    queryFn: () => fetchFeed(1),
+    queryFn: () => fetchFeed({ cursor: null, limit: 1 }),
   })
 
   if (isLoading) {

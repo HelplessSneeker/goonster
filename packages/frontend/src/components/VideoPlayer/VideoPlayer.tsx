@@ -3,6 +3,7 @@ import type { VideoMeta } from '@goonster/shared'
 import { useVideoPlayer } from '../../hooks/useVideoPlayer'
 import { useVideoProgress } from '../../hooks/useVideoProgress'
 import { resolveVideoUrl } from '../../lib/resolveVideoUrl'
+import { useFeedStore } from '../../store/feedStore'
 import MuteButton from './MuteButton'
 import ProgressBar from './ProgressBar'
 import PauseFlash from './PauseFlash'
@@ -12,13 +13,21 @@ interface VideoPlayerProps {
 }
 
 export default function VideoPlayer({ video }: VideoPlayerProps) {
-  const { videoRef, isPlaying, isMuted, togglePlay, toggleMute } = useVideoPlayer()
+  const { videoRef, isPlaying, togglePlay } = useVideoPlayer()
+  const { isMuted, toggleMute } = useFeedStore()
   const progress = useVideoProgress(videoRef)
 
   // Guarantee autoplay starts regardless of mount timing (RESEARCH.md Open Question 3)
   useEffect(() => {
     videoRef.current?.play().catch(() => {})
   }, [video.filename, videoRef])
+
+  // Sync video element muted property with global store state
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted
+    }
+  }, [isMuted, videoRef])
 
   return (
     <div className="fullscreen-container relative bg-black" onClick={togglePlay}>

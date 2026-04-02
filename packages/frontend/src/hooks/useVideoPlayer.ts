@@ -3,7 +3,6 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 export function useVideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(true) // starts muted per PLAY-02
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current
@@ -16,14 +15,6 @@ export function useVideoPlayer() {
     }
   }, [])
 
-  const toggleMute = useCallback(() => {
-    const video = videoRef.current
-    if (!video) return
-    video.muted = !video.muted
-    setIsMuted(video.muted) // read back from DOM element, not negation of state (Pitfall 4)
-  }, [])
-
-  // Sync React state with video element events (browser may pause for buffering, etc.)
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
@@ -37,5 +28,5 @@ export function useVideoPlayer() {
     }
   }, [])
 
-  return { videoRef, isPlaying, isMuted, togglePlay, toggleMute }
+  return { videoRef, isPlaying, togglePlay }
 }
