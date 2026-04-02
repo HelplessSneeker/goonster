@@ -59,12 +59,12 @@ Phase 3 is icon/control-dominant. The only new text element is the end-of-feed m
 |------|------|--------|-------------|-------|
 | Body | 16px (`text-base`) | 400 | 1.5 | Feed loading state ("Loading...") |
 | Label | 14px (`text-sm`) | 600 | 1.2 | Error state message |
-| End-of-feed | 16px (`text-base`) | 500 (`font-medium`) | 1.0 | "You've seen everything" — single centered line |
+| End-of-feed | 16px (`text-base`) | 400 (`font-normal`) | 1.0 | "You've seen everything" — single centered line |
 | — | — | — | — | No heading or display text in feed UI |
 
 **Font stack:** `system-ui, -apple-system, sans-serif` — Phase 2 precedent, unchanged.
 
-**Weights declared:** regular (400) + medium (500) + semibold (600). The end-of-feed copy uses `font-medium` (500) — a deliberate mid-point between body (400) and error label (600) to communicate a neutral, complete state without alarm or emphasis. Source: CONTEXT.md D-08; RESEARCH.md EndOfFeedSlide code example.
+**Weights declared:** regular (400) + semibold (600). The end-of-feed copy uses `font-normal` (400) — matches body weight, communicating neutral completion. Visual distinction from body text is provided by `tracking-wide` letter-spacing rather than a third weight. Source: CONTEXT.md D-08; RESEARCH.md EndOfFeedSlide code example.
 
 **Tracking for end-of-feed:** `tracking-wide` — slight letter-spacing on "You've seen everything" for visual breathing room on a clean black screen. Source: RESEARCH.md EndOfFeedSlide code example.
 
@@ -133,7 +133,7 @@ Inherited from Phase 2 (unchanged). Phase 3 adds no new colors — buffering spi
 - **Position in slide list:** last `SwiperSlide` after all video slides — a sentinel slide
 - **Layout:** `fullscreen-container bg-black flex items-center justify-center`
 - **Text:** "You've seen everything" — centered, single line
-- **Text style:** `text-white text-base font-medium tracking-wide`
+- **Text style:** `text-white text-base font-normal tracking-wide`
 - **No buttons, no illustrations, no action prompts** (D-08)
 - **Forward swipe lock:** `onSlideChange` sets `swiper.allowSlideNext = false` when `activeIndex >= totalVideoCount` (mutate instance, not React prop — see RESEARCH.md Pitfall 1)
 - **Back swipe:** allowed — user can swipe back down from end-of-feed slide to previous video (D-09)
