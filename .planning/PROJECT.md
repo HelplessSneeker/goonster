@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A mobile-first short-form video player that aggregates content shared by friends from TikTok, Instagram Reels, and YouTube Shorts into a single, friend-curated feed. Instead of an algorithm deciding what you watch, your feed is built from what your friends actually share.
+A mobile-first short-form video player that aggregates content shared by friends from TikTok, Instagram Reels, and YouTube Shorts into a single, friend-curated feed. v1.0 delivers a buttery vertical swipe feed playing static video files with full iOS Safari compatibility.
 
 ## Core Value
 
@@ -12,15 +12,18 @@ A vertical-swipe video feed that plays content your friends chose to share — n
 
 ### Validated
 
-- [x] Backend serves static video files via API — Validated in Phase 01: backend-foundation (HTTP 206 range requests, @fastify/static)
-- [x] Full-screen autoplay and loop for short-form videos — Validated in Phase 02: video-player-core
-- [x] Mobile-first web app with vertical swipe video feed — Validated in Phase 03: feed-navigation
-- [x] Smooth swipe-to-next navigation between videos — Validated in Phase 03: feed-navigation
-- [x] Responsive design optimized for mobile viewports — Validated in Phase 02: video-player-core
+- ✓ Video plays fullscreen in vertical (9:16) format with correct mobile viewport — v1.0
+- ✓ First video autoplays muted on page load without user interaction — v1.0
+- ✓ Mute/unmute control, tap-to-pause, auto-loop, progress bar — v1.0
+- ✓ Vertical swipe navigation with snap animation — v1.0
+- ✓ Next video preloaded, buffering indicator, end-of-feed state — v1.0
+- ✓ HTTP 206 range streaming, cursor-paginated feed API — v1.0
+- ✓ Storage abstraction interface (DiskVideoStore, cloud-swappable) — v1.0
+- ✓ iOS Safari playsInline, 100dvh viewport, single-video constraint — v1.0
 
 ### Active
 
-None — all v1.0 requirements validated.
+None — planning next milestone.
 
 ### Out of Scope
 
@@ -30,14 +33,17 @@ None — all v1.0 requirements validated.
 - User authentication — not needed for static video playback
 - Video upload — v1 uses pre-existing static files only
 - Algorithm or recommendation engine — fundamentally against the product vision
+- Offline mode — real-time friend-curated feed is core value
+- Push notifications per share — notification fatigue; anti-pattern for this product's ethos
 
 ## Context
 
-- **Product vision:** Anti-algorithm video feed. Friends share links from major short-form platforms, Goonster extracts and aggregates the videos into one feed.
-- **Milestone 1 focus:** Get the video player experience right with static files. No social features, no extraction — just a buttery vertical swipe feed.
-- **Future path:** Web app first, then wrap or rebuild as native mobile app via framework (React Native, Flutter, or Capacitor — TBD based on research).
-- **Tech direction:** Node/TypeScript backend. Frontend framework TBD (research will inform).
-- **Storage evolution:** Static files on disk for v1, plan architecture to support cloud storage (S3/GCS) in future milestones.
+Shipped v1.0 with 1,554 LOC TypeScript across 3 packages (shared, backend, frontend).
+Tech stack: React 19 + Vite 8 + Fastify 5 + Tailwind 4 + Swiper.js 11 + Zustand 5 + TanStack Query 5.
+pnpm monorepo with shared types package.
+79 tests (28 backend, 18 video player, 33 feed) all passing.
+10 human verification items pending (real-device browser testing).
+9 tech debt items documented in milestone audit (none blocking).
 
 ## Constraints
 
@@ -50,10 +56,17 @@ None — all v1.0 requirements validated.
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Node/TypeScript backend | User preference, JS everywhere | ✓ Fastify 5 + TypeScript monorepo |
+| Node/TypeScript backend | User preference, JS everywhere | ✓ Good — Fastify 5 + TypeScript monorepo |
+| React 19 + Vite 8 frontend | Largest ecosystem, best React Native upgrade path | ✓ Good — concurrent rendering, fast HMR |
+| Fastify 5 over Express | 2-3x performance, native TypeScript, built-in schema validation | ✓ Good — @fastify/static handles HTTP 206 natively |
+| Swiper.js over CSS scroll-snap | Battle-tested touch gestures, iOS Safari momentum handling | ✓ Good — eliminated snap jank issues |
+| Zustand over Redux | Minimal boilerplate for simple feed state (index, mute) | ✓ Good — clean global mute sync |
+| VideoStore abstraction | Cloud-swappable later without route handler changes | ⚠️ Revisit — @fastify/static bypasses store for streaming |
+| Static files for m1 | Simplify scope, focus on player UX | ✓ Good — DiskVideoStore + fixtures |
 | Mobile framework deferred | Research needed, not blocking m1 | — Pending |
-| Static files for m1 | Simplify scope, focus on player UX | ✓ DiskVideoStore + fixtures |
 | No algorithm by design | Core product differentiator — friend-curated feed | — Pending |
+| resolveVideoUrl abstraction | Single function to swap local/cloud URLs | ✓ Good — clean separation |
+| Global mute in Zustand store | Mute state persists across swipes | ✓ Good — natural UX |
 
 ## Evolution
 
@@ -73,4 +86,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after Phase 03 completion — all v1.0 milestone phases complete*
+*Last updated: 2026-04-02 after v1.0 milestone*
