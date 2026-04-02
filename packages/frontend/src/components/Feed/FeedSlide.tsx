@@ -35,6 +35,7 @@ export default function FeedSlide({ video, isActive }: FeedSlideProps) {
       videoEl.play().catch(() => {})
     } else {
       videoEl.pause()
+      videoEl.currentTime = 0
     }
 
     return () => {
