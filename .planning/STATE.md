@@ -90,9 +90,10 @@ None yet.
 | 260402-cj4 | create a readme file | 2026-04-02 | 7bf64f3 | [260402-cj4-create-a-readme-file](./quick/260402-cj4-create-a-readme-file/) |
 | 260402-ewv | add a script to the monorepo root to start the whole application | 2026-04-02 | 96d0b6a | [260402-ewv-add-a-script-to-the-monorepo-root-to-sta](./quick/260402-ewv-add-a-script-to-the-monorepo-root-to-sta/) |
 | 260402-g05 | fix documentation metadata debt — correct metadata.json size, ROADMAP/STATE accuracy, SUMMARY requirements-completed | 2026-04-02 | 6847381 | [260402-g05-fix-the-documentation-metadata-debt-chec](./quick/260402-g05-fix-the-documentation-metadata-debt-chec/) |
+| 260402-gl5 | update REQUIREMENTS.md — mark 6 pending v1 requirements as complete | 2026-04-02 | 7755693 | [260402-gl5-update-requirements-md-the-6-pending-com](./quick/260402-gl5-update-requirements-md-the-6-pending-com/) |
 
 ## Session Continuity
 
-Last session: 2026-04-02T09:37:00.000Z
-Stopped at: Completed quick task 260402-g05
+Last session: 2026-04-02T09:45:00.000Z
+Stopped at: Completed quick task 260402-gl5
 Resume file: None
