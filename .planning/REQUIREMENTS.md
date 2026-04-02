@@ -9,10 +9,10 @@ Requirements for User Authentication & Connected Accounts milestone. Each maps t
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can register with email and password
-- [ ] **AUTH-02**: User can log in with email and password
-- [ ] **AUTH-03**: User can log out (session destroyed server-side)
-- [ ] **AUTH-04**: User session persists across browser refresh (httpOnly cookie)
+- [x] **AUTH-01**: User can register with email and password
+- [x] **AUTH-02**: User can log in with email and password
+- [x] **AUTH-03**: User can log out (session destroyed server-side)
+- [x] **AUTH-04**: User session persists across browser refresh (httpOnly cookie)
 - [ ] **AUTH-05**: User receives email verification link after registration
 - [ ] **AUTH-06**: User can request password reset via email link
 - [ ] **AUTH-07**: User can set new password via reset link
@@ -35,7 +35,7 @@ Requirements for User Authentication & Connected Accounts milestone. Each maps t
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: PostgreSQL database with Drizzle ORM schema (users, sessions, accounts, tokens)
+- [x] **INFRA-01**: PostgreSQL database with Drizzle ORM schema (users, sessions, accounts, tokens)
 - [ ] **INFRA-02**: Video feed requires authentication to view
 - [ ] **INFRA-03**: Client-side routing (login, register, profile, feed pages)
 - [ ] **INFRA-04**: Transactional email delivery for verification and password reset
@@ -71,14 +71,14 @@ Requirements for User Authentication & Connected Accounts milestone. Each maps t
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 4 | Pending |
+| INFRA-01 | Phase 4 | Complete |
 | INFRA-02 | Phase 4 | Pending |
 | INFRA-03 | Phase 4 | Pending |
 | INFRA-05 | Phase 4 | Pending |
-| AUTH-01 | Phase 4 | Pending |
-| AUTH-02 | Phase 4 | Pending |
-| AUTH-03 | Phase 4 | Pending |
-| AUTH-04 | Phase 4 | Pending |
+| AUTH-01 | Phase 4 | Complete |
+| AUTH-02 | Phase 4 | Complete |
+| AUTH-03 | Phase 4 | Complete |
+| AUTH-04 | Phase 4 | Complete |
 | OAUTH-01 | Phase 5 | Pending |
 | OAUTH-02 | Phase 5 | Pending |
 | OAUTH-05 | Phase 5 | Pending |

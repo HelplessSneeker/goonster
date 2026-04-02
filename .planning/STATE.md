@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: User Authentication & Connected Accounts
-status: planning
-stopped_at: Phase 4 UI-SPEC approved
-last_updated: "2026-04-02T21:25:25.339Z"
-last_activity: 2026-04-02 — Roadmap created for v1.1
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-04-02T22:19:22.226Z"
+last_activity: 2026-04-02
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** A vertical-swipe video feed that plays content your friends chose to share — no algorithm, just people you trust.
-**Current focus:** Phase 4 — Database Foundation & Auth Core
+**Current focus:** Phase 04 — database-foundation-auth-core
 
 ## Current Position
 
-Phase: 4 of 7 (Database Foundation & Auth Core)
-Plan: — (not yet planned)
-Status: Ready to plan
-Last activity: 2026-04-02 — Roadmap created for v1.1
+Phase: 04 (database-foundation-auth-core) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 04 P01 | 3 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -57,6 +58,8 @@ Progress: [░░░░░░░░░░] 0%
 - Stay on drizzle-orm 0.45.x — v1.0.0-beta breaks better-auth adapter (issue #6766)
 - Google OAuth first — no app review, localhost works; TikTok/Instagram deferred to Phase 6
 - Phase 7 depends on Phase 4, not Phase 6 — email delivery is independent of OAuth providers
+- [Phase 04]: Zod v3 intentionally retained for backend route validation — better-auth bundles its own zod v4 internally, no runtime conflict; upgrading would break existing z.coerce.number() usage in feed.ts
+- [Phase 04]: describe.skipIf(!DATABASE_URL) used for auth integration tests — prevents CI failures on environments without PostgreSQL
 
 ### Pending Todos
 
@@ -80,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T21:25:25.336Z
-Stopped at: Phase 4 UI-SPEC approved
-Resume file: .planning/phases/04-database-foundation-auth-core/04-UI-SPEC.md
+Last session: 2026-04-02T22:19:22.223Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
