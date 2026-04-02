@@ -18,6 +18,7 @@ provides:
   - EndOfFeedSlide: sentinel slide, "You've seen everything", end-of-feed lock
   - App.tsx: thin shell rendering FeedContainer
 affects: [App.tsx (consumer), all Phase 3 tests]
+requirements-completed: [FEED-01, FEED-02, FEED-03, FEED-04, FEED-05, FEED-06]
 
 # Tech tracking
 tech-stack:
