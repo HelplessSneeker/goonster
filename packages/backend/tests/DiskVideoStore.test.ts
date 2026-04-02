@@ -49,7 +49,7 @@ describe('DiskVideoStore', () => {
 
     it('returns the actual file size', async () => {
       const size = await store.getSize('a1b2c3d4-e5f6-7890-abcd-ef1234567801')
-      expect(size).toBe(5995)
+      expect(size).toBe(3243336)
     })
 
     it('throws for a non-existent video id', async () => {

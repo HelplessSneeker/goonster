@@ -1,11 +1,11 @@
 [
   {
     "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567801",
-    "filename": "placeholder-01.mp4",
-    "title": "Placeholder Video 1",
-    "duration": 3,
+    "filename": "tree_video.mp4",
+    "title": "Tree Video",
+    "duration": 10,
     "mimeType": "video/mp4",
-    "size": 5995,
+    "size": 3243336,
     "sourcePlatform": "local"
   },
   {
