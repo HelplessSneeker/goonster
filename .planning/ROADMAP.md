@@ -60,7 +60,7 @@ Plans:
   4. After the last video, the screen shows "You've seen everything" and no further swipes advance
 **Plans**: 3 plans
 Plans:
-- [ ] 03-01-PLAN.md — Install swiper+zustand, create feedStore, upgrade feedApi to cursor pagination, create useFeed hook, refactor useVideoPlayer mute state
+- [x] 03-01-PLAN.md — Install swiper+zustand, create feedStore, upgrade feedApi to cursor pagination, create useFeed hook, refactor useVideoPlayer mute state
 - [ ] 03-02-PLAN.md — Feed components (FeedContainer, FeedSlide, BufferingSpinner, EndOfFeedSlide), App.tsx wiring, component tests
 - [ ] 03-03-PLAN.md — Human verification checkpoint: desktop and mobile device testing
 **UI hint**: yes
@@ -74,4 +74,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Backend Foundation | 2/2 | Complete   | 2026-04-01 |
 | 2. Video Player Core | 2/3 | In Progress|  |
-| 3. Feed & Navigation | 0/3 | Not started | - |
+| 3. Feed & Navigation | 1/3 | In Progress|  |

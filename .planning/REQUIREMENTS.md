@@ -21,8 +21,8 @@ Requirements for initial release (Milestone 1: Static Video Player).
 - [ ] **FEED-01**: User can swipe up to advance to the next video
 - [ ] **FEED-02**: User can swipe down to return to the previous video
 - [ ] **FEED-03**: Videos snap into place after swipe with smooth animation
-- [ ] **FEED-04**: Next video is preloaded before user swipes to eliminate perceived gap
-- [ ] **FEED-05**: Loading/buffering state indicator displays when video is not yet ready
+- [x] **FEED-04**: Next video is preloaded before user swipes to eliminate perceived gap
+- [x] **FEED-05**: Loading/buffering state indicator displays when video is not yet ready
 - [ ] **FEED-06**: End-of-feed state displays "You've seen everything" when no more videos remain
 
 ### Backend API
@@ -93,8 +93,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FEED-01 | Phase 3 | Pending |
 | FEED-02 | Phase 3 | Pending |
 | FEED-03 | Phase 3 | Pending |
-| FEED-04 | Phase 3 | Pending |
-| FEED-05 | Phase 3 | Pending |
+| FEED-04 | Phase 3 | Complete |
+| FEED-05 | Phase 3 | Complete |
 | FEED-06 | Phase 3 | Pending |
 | API-01 | Phase 1 | Complete |
 | API-02 | Phase 1 | Complete |
