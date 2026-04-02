@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: Static Video Player
-status: completed
-stopped_at: "Milestone v1.0 archived"
-last_updated: "2026-04-02T13:30:00.000Z"
+milestone: v1.1
+milestone_name: User Authentication & Connected Accounts
+status: active
+stopped_at: null
+last_updated: "2026-04-02T14:00:00.000Z"
 last_activity: 2026-04-02
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,24 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** A vertical-swipe video feed that plays content your friends chose to share — no algorithm, just people you trust.
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v1.1
 
 ## Current Position
 
-Phase: —
+Phase: Not started (defining requirements)
 Plan: —
-Status: v1.0 milestone complete and archived
-Last activity: 2026-04-02 - Milestone v1.0 archived
-
-Progress: [██████████] 100%
-
-## Performance Metrics
-
-**v1.0 Summary:**
-- 3 phases, 8 plans, 15 tasks
-- 79 tests, all passing
-- 1,554 LOC TypeScript
-- 75 commits over 2 days
+Status: Defining requirements
+Last activity: 2026-04-02 — Milestone v1.1 started
 
 ## Accumulated Context
 
@@ -68,5 +58,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-02
-Stopped at: Milestone v1.0 archived
+Stopped at: Milestone v1.1 requirements definition
 Resume file: None

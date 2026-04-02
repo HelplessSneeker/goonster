@@ -23,14 +23,24 @@ A vertical-swipe video feed that plays content your friends chose to share — n
 
 ### Active
 
-None — planning next milestone.
+#### Current Milestone: v1.1 User Authentication & Connected Accounts
+
+**Goal:** Add user authentication (email/password + OAuth) with connected accounts architecture for TikTok, Google, and Instagram, gating the existing feed behind login.
+
+**Target features:**
+- Email/password registration and login
+- OAuth framework with real redirect flows for Google, TikTok, and Instagram
+- Connected accounts UI (link/unlink providers on profile)
+- Basic profile page (name, avatar, connected accounts list)
+- Auth-gated feed (must be logged in to view)
+- PostgreSQL database for user/session/account storage
 
 ### Out of Scope
 
 - Link sharing / URL ingestion — future milestone, after player is solid
 - Video extraction from platforms (TikTok, Reels, Shorts) — future milestone, complex platform integration
 - Friend/social mechanics (accounts, following, sharing) — future milestone, requires auth and social graph
-- User authentication — not needed for static video playback
+- User authentication — moved to Active for v1.1
 - Video upload — v1 uses pre-existing static files only
 - Algorithm or recommendation engine — fundamentally against the product vision
 - Offline mode — real-time friend-curated feed is core value
@@ -42,14 +52,15 @@ Shipped v1.0 with 1,554 LOC TypeScript across 3 packages (shared, backend, front
 Tech stack: React 19 + Vite 8 + Fastify 5 + Tailwind 4 + Swiper.js 11 + Zustand 5 + TanStack Query 5.
 pnpm monorepo with shared types package.
 79 tests (28 backend, 18 video player, 33 feed) all passing.
-10 human verification items pending (real-device browser testing).
-9 tech debt items documented in milestone audit (none blocking).
+v1.1 adds PostgreSQL, user auth (email/password + OAuth), connected accounts architecture (Google, TikTok, Instagram), and basic profile page.
+OAuth flows are architectural — real redirects but no content pulling. TikTok/Instagram app review deferred.
 
 ## Constraints
 
 - **Tech stack (backend)**: Node/TypeScript — user preference
 - **Mobile-first**: Web app must work excellently on mobile viewports; desktop is secondary
-- **Static content only (m1)**: No upload, no extraction, no external API calls — serve files from disk
+- **Static content only (video)**: No upload, no extraction — serve video files from disk
+- **Database**: PostgreSQL for user/auth data
 - **Future mobile**: Architecture choices should not preclude wrapping as native app later
 
 ## Key Decisions
@@ -86,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after v1.0 milestone*
+*Last updated: 2026-04-02 after v1.1 milestone start*
