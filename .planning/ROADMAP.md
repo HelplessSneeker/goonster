@@ -39,11 +39,12 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
   3. User can log out and the session is destroyed server-side
   4. Unauthenticated user visiting the feed is redirected to /login; authenticated user is shown the feed
   5. Client-side routes /login, /register, /feed, and /profile exist and render the correct page
-**Plans**: 3 plans
+**Plans**: 4 plans
 Plans:
-- [ ] 04-01-PLAN.md — PostgreSQL + Drizzle ORM + better-auth backend infrastructure, CORS fix, auth guards, frontend auth client
-- [ ] 04-02-PLAN.md — Auth UI components, login/register pages, React Router setup, ProtectedRoute, 401 handler
-- [ ] 04-03-PLAN.md — Backend auth integration tests, end-to-end verification checkpoint
+- [ ] 04-01-PLAN.md — PostgreSQL + Drizzle ORM + better-auth backend infrastructure, Wave 0 test stubs
+- [ ] 04-02-PLAN.md — CORS credentials fix, auth guards on feed/video, Vite proxy, frontend auth client, shared types
+- [ ] 04-03-PLAN.md — Auth UI components, login/register/profile pages, React Router setup, ProtectedRoute, LogoutButton, 401 handler
+- [ ] 04-04-PLAN.md — Backend auth integration tests, end-to-end verification checkpoint
 **UI hint**: yes
 
 ### Phase 5: Google OAuth & Profile Page
@@ -91,7 +92,7 @@ Plans:
 | 1. Backend Foundation | v1.0 | 2/2 | Complete | 2026-04-01 |
 | 2. Video Player Core | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 3. Feed & Navigation | v1.0 | 3/3 | Complete | 2026-04-02 |
-| 4. Database Foundation & Auth Core | v1.1 | 0/3 | Planned | - |
+| 4. Database Foundation & Auth Core | v1.1 | 0/4 | Planned | - |
 | 5. Google OAuth & Profile Page | v1.1 | 0/? | Not started | - |
 | 6. TikTok OAuth & Instagram Scaffold | v1.1 | 0/? | Not started | - |
 | 7. Email Delivery & Profile Completion | v1.1 | 0/? | Not started | - |
