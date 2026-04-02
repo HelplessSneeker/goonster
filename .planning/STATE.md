@@ -91,9 +91,10 @@ None yet.
 | 260402-ewv | add a script to the monorepo root to start the whole application | 2026-04-02 | 96d0b6a | [260402-ewv-add-a-script-to-the-monorepo-root-to-sta](./quick/260402-ewv-add-a-script-to-the-monorepo-root-to-sta/) |
 | 260402-g05 | fix documentation metadata debt — correct metadata.json size, ROADMAP/STATE accuracy, SUMMARY requirements-completed | 2026-04-02 | 6847381 | [260402-g05-fix-the-documentation-metadata-debt-chec](./quick/260402-g05-fix-the-documentation-metadata-debt-chec/) |
 | 260402-gl5 | update REQUIREMENTS.md — mark 6 pending v1 requirements as complete | 2026-04-02 | 7755693 | [260402-gl5-update-requirements-md-the-6-pending-com](./quick/260402-gl5-update-requirements-md-the-6-pending-com/) |
+| 260402-hc2 | clean up medium tech debt — DiskVideoStore safety, logging, shared exports, error envelopes | 2026-04-02 | fdb44b0 | [260402-hc2-clean-up-medium-tech-debt-diskvideostore](./quick/260402-hc2-clean-up-medium-tech-debt-diskvideostore/) |
 
 ## Session Continuity
 
-Last session: 2026-04-02T09:45:00.000Z
-Stopped at: Completed quick task 260402-gl5
+Last session: 2026-04-02T10:00:00.000Z
+Stopped at: Completed quick task 260402-hc2
 Resume file: None
