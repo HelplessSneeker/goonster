@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Backend Foundation** - Node/TypeScript server with HTTP 206 video streaming and cursor-paginated feed API (completed 2026-04-01)
 - [ ] **Phase 2: Video Player Core** - Single-video player component with all iOS Safari constraints addressed
-- [ ] **Phase 3: Feed & Navigation** - Vertical swipe feed with preloading, buffering indicators, and end-of-feed state
+- [x] **Phase 3: Feed & Navigation** - Vertical swipe feed with preloading, buffering indicators, and end-of-feed state (completed 2026-04-02)
 
 ## Phase Details
 
@@ -62,7 +62,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Install swiper+zustand, create feedStore, upgrade feedApi to cursor pagination, create useFeed hook, refactor useVideoPlayer mute state
 - [x] 03-02-PLAN.md — Feed components (FeedContainer, FeedSlide, BufferingSpinner, EndOfFeedSlide), App.tsx wiring, component tests
-- [ ] 03-03-PLAN.md — Human verification checkpoint: desktop and mobile device testing
+- [x] 03-03-PLAN.md — Human verification checkpoint: desktop and mobile device testing
 **UI hint**: yes
 
 ## Progress
@@ -74,4 +74,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Backend Foundation | 2/2 | Complete   | 2026-04-01 |
 | 2. Video Player Core | 2/3 | In Progress|  |
-| 3. Feed & Navigation | 2/3 | In Progress|  |
+| 3. Feed & Navigation | 3/3 | Complete   | 2026-04-02 |
