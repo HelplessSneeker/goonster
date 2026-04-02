@@ -1,8 +1,544 @@
-# Pitfalls Research
+# Domain Pitfalls
 
 **Domain:** Mobile-first short-form vertical video player web app
-**Researched:** 2026-04-01
-**Confidence:** HIGH (iOS/Android constraints verified against WebKit official docs and MDN; patterns verified across multiple sources)
+**Researched:** 2026-04-02 (v1.1 auth section added); 2026-04-01 (v1.0 video player section)
+**Confidence:** HIGH for video player pitfalls (iOS/Android constraints verified against WebKit official docs and MDN); MEDIUM–HIGH for auth/OAuth/PostgreSQL pitfalls (verified against official platform docs, OWASP, and multiple sources)
+
+---
+
+# Part 1: v1.1 — Authentication, OAuth, and PostgreSQL Pitfalls
+
+These pitfalls are specific to adding user auth (email/password + OAuth), connected accounts (Google, TikTok, Instagram), and PostgreSQL to an existing Fastify 5 + React 19 application that currently has no auth or database.
+
+---
+
+## Critical Pitfalls
+
+### Pitfall A1: Fastify Plugin Encapsulation Breaks Auth Decorators Across Routes
+
+**What goes wrong:**
+Registering `@fastify/jwt` or `@fastify/session` inside a nested plugin scope (e.g., inside a route group plugin) makes those decorators invisible to routes registered in sibling or parent scopes. Routes outside that scope call `request.jwtVerify()` and get a runtime error saying the method doesn't exist. This is not a JWT configuration bug — it's Fastify's encapsulation model working as designed.
+
+**Why it happens:**
+Fastify's plugin system is strictly scoped. Decorators, hooks, and plugins registered in a child context are not available in parent or sibling contexts. Developers new to Fastify assume plugins work like Express middleware — registered once, available everywhere. They register auth inside a route file, then wonder why the decorator is missing on other routes.
+
+**Consequences:**
+- Runtime crashes when any unprotected-but-decorated route is hit
+- Inconsistent auth coverage — some routes protected, others silently unprotected
+- Can masquerade as a JWT secret or token problem (the wrong error message)
+
+**Prevention:**
+Register all auth plugins (JWT, session, cookie) at the root Fastify instance level, **or** wrap them with `fastify-plugin` (the `fp()` wrapper) to opt out of encapsulation. The `fastify-plugin` wrapper tells Fastify to export the plugin's decorators to the parent context.
+
+```typescript
+// Wrong: registered inside a scoped plugin, not available outside
+fastify.register(async (scopedInstance) => {
+  scopedInstance.register(fastifyJwt, { secret: '...' }); // scoped only
+  scopedInstance.get('/protected', ...);
+});
+
+// Correct: registered at root, or with fp() wrapper
+import fp from 'fastify-plugin';
+export default fp(async (fastify) => {
+  fastify.register(fastifyJwt, { secret: process.env.JWT_SECRET });
+  fastify.decorate('authenticate', async (request, reply) => {
+    await request.jwtVerify();
+  });
+});
+```
+
+**Detection:**
+`TypeError: request.jwtVerify is not a function` on routes outside the auth plugin's scope.
+
+**Phase to address:** Phase 1 (Auth infrastructure / plugin registration)
+
+---
+
+### Pitfall A2: `decorateRequest` with a Reference Type Shares State Across All Requests
+
+**What goes wrong:**
+Attaching an object to a Fastify request decorator using `fastify.decorateRequest('user', {})` creates a **shared reference** — the same object instance is mutated by every concurrent request. Request A's user data bleeds into Request B. In an auth context, this means User A could see User B's identity. Fastify emits a deprecation warning about this, but the code still runs, so it's easy to miss in development under low concurrency.
+
+**Why it happens:**
+Developers follow Node.js/Express patterns where `req.user = ...` is safe per-request. In Fastify, `decorateRequest` with an object literal as the initial value registers one shared object, not a factory. The mutation happens in hooks, and since HTTP servers under load have many concurrent requests, the state collision appears as intermittent auth bugs that don't reproduce under single-user testing.
+
+**Consequences:**
+- Auth bypass: one user sees another user's session data
+- Intermittent — only surfaces under concurrent load, invisible in sequential unit tests
+- Data leakage between user sessions
+
+**Prevention:**
+Always initialize reference-type decorators with `null` (not `{}`), and assign the real value per-request inside an `onRequest` or `preHandler` hook:
+
+```typescript
+// Declare the decorator shape (null initial value — no shared reference)
+fastify.decorateRequest('currentUser', null);
+
+// Populate per-request in a hook
+fastify.addHook('preHandler', async (request) => {
+  if (request.headers.authorization) {
+    request.currentUser = await resolveUser(request);
+  }
+});
+```
+
+**Detection:**
+Fastify logs `[FSTDEP006] FastifyDeprecation: You are decorating Request/Reply with a reference type. This reference is shared amongst all requests.` — treat this as a blocking error, not a warning.
+
+**Phase to address:** Phase 1 (Auth infrastructure)
+
+---
+
+### Pitfall A3: Instagram Basic Display API is Gone — Wrong OAuth Flow Used
+
+**What goes wrong:**
+Instagram's Basic Display API reached end-of-life on December 4, 2024. All requests return errors. Developers who research "Instagram OAuth Node.js" find articles from 2021–2023 describing the Basic Display API flow (`/oauth/authorize` with `scope=user_profile,user_media`) and implement a dead integration. The OAuth redirect succeeds (Instagram's auth server still accepts the request) but token exchange fails or returns an error.
+
+**Why it happens:**
+Most Node.js OAuth tutorials and many third-party libraries (passport-instagram, etc.) were written for the now-deprecated Basic Display API. Meta's migration path is not obvious from search results, and the new "Instagram Login" API (launched mid-2024) only supports Business and Creator accounts — not personal accounts.
+
+**Consequences:**
+- Complete integration failure post-December 2024
+- Personal Instagram accounts cannot be connected at all — only Business/Creator accounts
+- OAuth redirect may partially succeed, creating a confusing debugging experience
+
+**Prevention:**
+Use the new **Instagram API with Instagram Login** (`instagram_business_basic` scope). Accept that personal Instagram accounts are not connectable. The new flow requires a Meta developer app with the `instagram_business_basic` scope approved. Implement this as "connect your Instagram Business or Creator account."
+
+Key scope changes (old scopes deprecated January 27, 2025):
+- Old: `user_profile`, `user_media` → Dead
+- New: `instagram_business_basic`, `instagram_business_content_publish` → Active
+
+**Detection:**
+OAuth callback returns error JSON from Meta's token endpoint; or token exchange succeeds but all Graph API calls return permission errors.
+
+**Phase to address:** Phase 2 (OAuth provider implementations) — must verify against current Meta docs before implementing, not from search results or tutorials.
+
+---
+
+### Pitfall A4: TikTok OAuth Uses Non-Standard Parameters That Break Generic OAuth Libraries
+
+**What goes wrong:**
+TikTok's OAuth implementation deviates from RFC 6749 in a critical way: it uses `client_key` instead of `client_id` as the parameter name in both the authorization request and the token exchange request. Generic OAuth libraries (passport, grant, simple-oauth2) that follow the standard will send `client_id`, which TikTok ignores or rejects. The authorization step may succeed (browser redirect works), but token exchange silently fails or returns `invalid_client`.
+
+Additionally, TikTok does not allow `localhost` as a redirect URI, making local development without a tunnel impossible.
+
+**Why it happens:**
+TikTok built its OAuth system before widespread standardization and never updated the parameter names. Most OAuth client libraries hard-code `client_id` per the RFC. Developers assume TikTok uses standard OAuth and only discover the deviation when token exchange fails.
+
+**Consequences:**
+- Token exchange fails entirely with a generic error
+- Must proxy or manually construct token exchange requests
+- Local development requires a public tunnel (ngrok, Cloudflare Tunnel, etc.) for every test
+
+**Prevention:**
+Do not use a generic OAuth library for TikTok. Build the TikTok OAuth flow manually or use a TikTok-specific adapter:
+
+```typescript
+// TikTok token exchange — must use client_key, not client_id
+const tokenResponse = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: new URLSearchParams({
+    client_key: process.env.TIKTOK_CLIENT_KEY,   // NOT client_id
+    client_secret: process.env.TIKTOK_CLIENT_SECRET,
+    code,
+    grant_type: 'authorization_code',
+    redirect_uri: REDIRECT_URI,
+  }),
+});
+```
+
+For local development: set up a permanent ngrok or Cloudflare Tunnel subdomain and register it as the redirect URI in the TikTok developer console.
+
+**Detection:**
+Token endpoint returns `{ error: "invalid_client" }` or empty response when `client_id` is sent instead of `client_key`.
+
+**Phase to address:** Phase 2 (TikTok OAuth implementation)
+
+---
+
+### Pitfall A5: Auto-Linking OAuth Accounts by Email Creates Account Takeover Vulnerability
+
+**What goes wrong:**
+When a user signs in with Google (email: user@gmail.com) and you have an existing email/password account with the same address, auto-linking them appears helpful but is a security vulnerability. An attacker who controls any OAuth provider that supplies the target email as a claim (verified or not) can take over the victim's account. The nOAuth vulnerability (Azure AD, 2023) and Google domain-reuse attacks both exploited this pattern.
+
+**Why it happens:**
+Email appears to be a natural primary key for user identity. Auto-linking "same email = same person" feels like good UX. OAuth tokens do include an email claim, so developers treat it as reliable. The flaw is that OAuth email claims vary in verification guarantees across providers, and email addresses can be recycled (domain expiry, provider account deletion and recreation).
+
+**Consequences:**
+- Complete account takeover — attacker controls the victim's connected accounts
+- Exploitable through any OAuth provider that allows email registration without strict verification
+- Difficult to detect after the fact — looks like a normal login
+
+**Prevention:**
+Never auto-link accounts by email. Require **explicit user confirmation** to link a new OAuth identity to an existing account: user must be actively logged in and initiate the link from their profile page. Use the provider's **immutable user ID** (Google: `sub` claim; TikTok: `open_id`; Meta: `id`) as the foreign key in the `connected_accounts` table, never the email. Store email as display data only, not as an identity key.
+
+Database schema principle:
+```sql
+-- Correct: provider + provider_user_id as the unique identity key
+CREATE TABLE connected_accounts (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id),
+  provider VARCHAR(50) NOT NULL,         -- 'google', 'tiktok', 'instagram'
+  provider_user_id VARCHAR(255) NOT NULL, -- immutable ID from provider
+  access_token TEXT,
+  refresh_token TEXT,
+  UNIQUE(provider, provider_user_id)     -- not UNIQUE(provider, email)
+);
+```
+
+**Detection:**
+Review whether the account linking code path checks `email` match vs `provider + provider_user_id` match. If email is in the lookup query for linking, the vulnerability exists.
+
+**Phase to address:** Phase 1 (Database schema design) + Phase 2 (OAuth callback handlers)
+
+---
+
+### Pitfall A6: Using `drizzle-kit push` in Production Destroys Schema History
+
+**What goes wrong:**
+`drizzle-kit push` applies schema changes directly to the database without generating migration files. In development this is convenient. Developers who use it to "just get the schema in" during early production setup lose the migration history needed to apply incremental changes to future database instances (CI, staging, production replicas). When a new environment needs to be provisioned, there is no migration trail — only the Drizzle schema file, which cannot tell you the sequence of changes that got the DB to its current state.
+
+**Why it happens:**
+`drizzle-kit push` is fast and the docs don't prominently warn against production use in the "getting started" flow. Developers use it while the project is young ("it's just dev anyway"), then forget to switch to `generate`/`migrate` before the first real deployment.
+
+**Consequences:**
+- Cannot replay schema history on a fresh database
+- CI/CD pipelines that run `drizzle-kit migrate` fail because the `migrations/` directory is empty
+- Rollback becomes impossible — no down migrations
+- First time this breaks is usually in a staging deploy before launch
+
+**Prevention:**
+Use `drizzle-kit push` only on a local development database. For all other environments (staging, production, CI), use the generate + migrate workflow from day one:
+
+```bash
+# Add new table/column: generate a migration file first
+npx drizzle-kit generate
+
+# Apply the migration to the target database
+npx drizzle-kit migrate
+
+# NEVER in staging/production:
+# npx drizzle-kit push  <-- destroys migration history
+```
+
+Commit the `drizzle/migrations/` directory to git. Treat migration files as append-only — never modify historical migrations.
+
+**Detection:**
+Check whether `drizzle/migrations/` directory exists and contains `.sql` files. If it's empty and the schema exists in the DB, `push` was used.
+
+**Phase to address:** Phase 1 (Database setup)
+
+---
+
+### Pitfall A7: Storing JWT Access Tokens in localStorage Enables XSS Session Theft
+
+**What goes wrong:**
+Storing the JWT in `localStorage` is the most common React SPA auth pattern shown in tutorials because it's simple. Any XSS vulnerability — including one from a compromised npm package or an unsanitized user input — gives an attacker `localStorage.getItem('token')` and full access to the user's session with no expiry constraint. For a social app with OAuth tokens and connected platform accounts, this is a high-severity breach.
+
+**Why it happens:**
+`localStorage` is simple to implement, survives page refreshes, and all tutorials for "React JWT auth" default to it. The XSS risk is abstract until it materializes.
+
+**Consequences:**
+- Session token theft via any XSS vector
+- Connected platform OAuth tokens (Google, TikTok, Instagram) potentially exposed
+- No way to revoke a stolen token short of rotating all secrets
+
+**Prevention:**
+Store the access token in memory (React state or Zustand store) — not `localStorage`. Store the refresh token in an `httpOnly`, `SameSite=Lax`, `Secure` cookie. The access token is lost on page refresh (by design), and the refresh token cookie silently renews it. This is the defense-in-depth pattern recommended by OWASP.
+
+On the Fastify backend, use `@fastify/cookie` with `@fastify/session` or manually set the refresh token cookie with proper flags:
+
+```typescript
+reply.setCookie('refresh_token', token, {
+  httpOnly: true,    // inaccessible to JavaScript
+  secure: true,      // HTTPS only in production
+  sameSite: 'lax',   // CSRF protection
+  path: '/auth',     // only sent to refresh endpoint
+  maxAge: 60 * 60 * 24 * 30, // 30 days
+});
+```
+
+**Detection:**
+Search for `localStorage.setItem` and `localStorage.getItem` in the auth flow code.
+
+**Phase to address:** Phase 1 (Auth token strategy) + Phase 3 (Frontend auth implementation)
+
+---
+
+## Moderate Pitfalls
+
+### Pitfall B1: OAuth State Parameter Not Validated — CSRF on Login Flow
+
+**What goes wrong:**
+The OAuth authorization request includes a `state` parameter designed to prevent CSRF attacks on the callback. If the server does not generate a random `state` value, store it in the session before the redirect, and verify it on callback, an attacker can craft a malicious callback URL and force a victim's browser to link the attacker's OAuth identity to the victim's account.
+
+**Prevention:**
+Generate a cryptographically random `state` value for every OAuth initiation. Store it server-side (in the session or a short-lived DB record). On callback, reject any request where the returned `state` does not match the stored value.
+
+```typescript
+import crypto from 'node:crypto';
+
+// On /auth/:provider/start
+const state = crypto.randomBytes(32).toString('hex');
+request.session.oauthState = state;
+const authUrl = `${provider.authUrl}?...&state=${state}`;
+
+// On /auth/:provider/callback
+if (request.query.state !== request.session.oauthState) {
+  return reply.code(403).send({ error: 'Invalid state — possible CSRF' });
+}
+```
+
+**Phase to address:** Phase 2 (OAuth callback handlers)
+
+---
+
+### Pitfall B2: Not Implementing PKCE for the SPA's OAuth Initiation Flow
+
+**What goes wrong:**
+OAuth 2.1 (and current best practices) require PKCE (Proof Key for Code Exchange) for all public clients — including SPAs. Without PKCE, if the authorization code is intercepted (via referrer headers, browser history, or open redirect), it can be exchanged for tokens without the original client. For a mobile-first web app that may later be wrapped as a native app, PKCE is non-negotiable.
+
+**Prevention:**
+Generate a `code_verifier` (random string) and `code_challenge` (SHA-256 of verifier) at auth initiation. Include `code_challenge` and `code_challenge_method=S256` in the authorization request. Send `code_verifier` during token exchange. Google supports PKCE natively; TikTok supports it; Meta/Instagram supports it.
+
+**Phase to address:** Phase 2 (OAuth flow implementation)
+
+---
+
+### Pitfall B3: PostgreSQL Connection Pool Not Registered in Fastify Startup Sequence
+
+**What goes wrong:**
+Registering the database plugin after route plugins causes routes to attempt database access before the pool is ready. In Fastify's async plugin registration sequence, if a route handler calls `fastify.pg.query(...)` and the plugin hasn't fully registered yet, it throws `TypeError: Cannot read properties of undefined`. This is a timing/ordering problem, not a config problem.
+
+**Prevention:**
+Register the database plugin before all route plugins. Use `await fastify.register(dbPlugin)` or rely on Fastify's built-in plugin ordering guarantee (plugins registered first are ready first). Use `fastify-plugin` wrapper on the DB plugin so the `fastify.db` decorator is available at the root level.
+
+```typescript
+// Correct order in server.ts
+await fastify.register(databasePlugin);  // must be first
+await fastify.register(authPlugin);      // depends on db
+await fastify.register(userRoutes);      // depends on auth + db
+```
+
+**Detection:**
+`TypeError: Cannot read properties of undefined (reading 'query')` at startup or on first request.
+
+**Phase to address:** Phase 1 (Server bootstrap / plugin registration order)
+
+---
+
+### Pitfall B4: Running Database Migrations at App Startup Without a Lock Causes Race Conditions
+
+**What goes wrong:**
+Calling `migrate(db, { migrationsFolder: './drizzle' })` inside `server.ts` before `fastify.listen()` seems clean but creates a race condition in any multi-instance deployment (Docker replicas, PM2 clusters, rolling deploys). Two instances start simultaneously, both run `migrate()`, and the second migration run fails because the first already applied the changes — or worse, both try to apply the same migration and corrupt the `drizzle_migrations` table.
+
+**Why it happens:**
+The Drizzle docs show `migrate()` in startup examples, which is correct for single-instance development but wrong for production multi-instance deployments.
+
+**Prevention:**
+Run migrations as a separate one-off step in CI/CD before deploying new app instances. Do not run migrations in `server.ts`. Use a dedicated `npm run migrate` script that runs once per deployment:
+
+```typescript
+// scripts/migrate.ts — run as a pre-deploy step, not inside the server
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+const db = drizzle(pool);
+await migrate(db, { migrationsFolder: './drizzle' });
+process.exit(0);
+```
+
+For v1.1 single-instance dev, startup migration is acceptable. Document the switch required before horizontal scaling.
+
+**Phase to address:** Phase 1 (Database setup) — acceptable at dev but flag for production
+
+---
+
+### Pitfall B5: OAuth Token Refresh Not Implemented — Silent Failures After Token Expiry
+
+**What goes wrong:**
+Google access tokens expire in 1 hour. TikTok access tokens expire in 24 hours. Instagram access tokens need refreshing on a longer cycle but still expire. If the backend stores access tokens but never refreshes them, all API calls on behalf of connected accounts silently fail after expiry. Users see their connected accounts listed as active but operations fail with 401 errors from the upstream platform.
+
+**Prevention:**
+Store `expires_at` alongside every access token. Before making any platform API call, check expiry and refresh if needed. Implement a token refresh function per provider. For v1.1 (architectural OAuth, no content-pulling), this is a deferred concern — but the schema must have the `expires_at` and `refresh_token` columns from day one to avoid a data migration later.
+
+```sql
+-- Required columns in connected_accounts from day one
+access_token TEXT,
+refresh_token TEXT,
+token_expires_at TIMESTAMPTZ,
+```
+
+**Phase to address:** Phase 1 (Schema design) — columns required now; refresh logic deferred to content-pulling milestone
+
+---
+
+### Pitfall B6: Auth-Gating the Existing Feed Without Handling the Auth State Loading Race
+
+**What goes wrong:**
+The existing feed app loads and immediately renders video content. When auth is added, the frontend needs to check auth state before rendering the feed. If this check is async (a `/auth/me` API call), there's a window between page load and auth resolution where the feed flickers — either showing content to unauthenticated users for a moment, or showing a blank screen before the auth check resolves. Mobile users on slow connections see this as a broken experience.
+
+**Why it happens:**
+The existing app has no auth concept. TanStack Query's `useQuery` for auth state is async by design. Developers add a `ProtectedRoute` wrapper but don't handle the loading state — they only handle `isAuthenticated: true` and `isAuthenticated: false`, forgetting `isLoading: true`.
+
+**Prevention:**
+Handle three auth states explicitly: `loading`, `authenticated`, and `unauthenticated`. During loading, show a neutral splash screen (not the feed and not the login page):
+
+```tsx
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { data: user, isLoading } = useQuery({ queryKey: ['auth/me'], ... });
+
+  if (isLoading) return <SplashScreen />;        // not null, not feed
+  if (!user) return <Navigate to="/login" />;
+  return <>{children}</>;
+}
+```
+
+Consider storing the auth state in an `httpOnly` session cookie so the server can redirect unauthenticated requests before they reach the SPA, eliminating the flicker entirely.
+
+**Phase to address:** Phase 3 (Frontend auth integration)
+
+---
+
+### Pitfall B7: Retrofitting Auth Routes Without a Consistent Error Response Shape
+
+**What goes wrong:**
+The existing v1.0 Fastify routes return errors in whatever shape each route handler decided. When auth middleware is added (JWT verification failures, session expiry, 403 forbidden), auth errors are returned in a different shape from existing API errors. The React app must now handle two error formats — or worse, the auth error is interpreted as a data fetch error and shown to the user as "Failed to load videos" instead of "Please log in."
+
+**Prevention:**
+Define a standard error response envelope before adding auth, and ensure all existing routes and new auth routes use it:
+
+```typescript
+// Standard error shape — establish this in shared/types
+interface ApiError {
+  error: string;   // machine-readable code
+  message: string; // human-readable
+  statusCode: number;
+}
+
+// In Fastify: set error handler in root instance
+fastify.setErrorHandler((error, request, reply) => {
+  reply.code(error.statusCode || 500).send({
+    error: error.code || 'INTERNAL_ERROR',
+    message: error.message,
+    statusCode: error.statusCode || 500,
+  });
+});
+```
+
+**Phase to address:** Phase 1 (Auth infrastructure) — standardize before adding any auth routes
+
+---
+
+## Minor Pitfalls
+
+### Pitfall C1: Weak bcrypt Cost Factor for Password Hashing
+
+**What goes wrong:**
+Using bcrypt with a cost factor below 12 makes brute-force attacks faster than necessary. Default examples in many Node.js tutorials use cost factor 10 (circa 2010 recommendation). OWASP's 2025 recommendation is cost factor 12 minimum; argon2id is preferred for new projects.
+
+**Prevention:**
+Use `argon2id` for new implementations (native Node.js crypto module in Node 22 supports `crypto.hash` but not argon2 — use the `argon2` npm package). If using bcrypt, use cost factor 12+.
+
+```typescript
+import argon2 from 'argon2';
+const hash = await argon2.hash(password); // defaults to argon2id, secure params
+const valid = await argon2.verify(hash, password);
+```
+
+**Phase to address:** Phase 1 (Email/password auth implementation)
+
+---
+
+### Pitfall C2: TikTok Sandbox Required for Testing Without App Review
+
+**What goes wrong:**
+TikTok's OAuth requires app review for production use. Without review, the app can only connect to a whitelist of up to 10 manually added test accounts. Developers discover this only after implementing the full OAuth flow and being unable to test with real accounts.
+
+**Prevention:**
+Create a TikTok developer sandbox before implementing the OAuth flow. Add test accounts to the sandbox whitelist. Plan for app review as a pre-launch gate — TikTok does not provide a timeline guarantee for review.
+
+**Phase to address:** Phase 2 (TikTok OAuth) — sandbox setup must precede any TikTok OAuth coding
+
+---
+
+### Pitfall C3: Missing `expires_at` on Sessions Causes Stale Sessions to Never Expire
+
+**What goes wrong:**
+Creating sessions in the database without an `expires_at` column means sessions live forever. If a user's account is compromised and they rotate their password, old sessions remain valid. No session revocation mechanism exists.
+
+**Prevention:**
+Always store `expires_at` on sessions. Add a cron or database cleanup job (or `WHERE expires_at < NOW()` filter on every session lookup) to purge stale sessions.
+
+**Phase to address:** Phase 1 (Session/auth schema)
+
+---
+
+### Pitfall C4: CORS Wildcard Carried Forward from v1.0 After Auth Is Added
+
+**What goes wrong:**
+The v1.0 PITFALLS section flagged that CORS wildcard (`*`) is acceptable for v1.0 static content but sets a bad precedent. Once auth cookies and JWT tokens are involved, `Access-Control-Allow-Origin: *` with `credentials: true` is blocked by browsers (the CORS spec forbids credentialed requests with wildcard origins). Developers who forget to update CORS config find that authenticated requests fail with CORS errors from day one of v1.1.
+
+**Prevention:**
+Replace the wildcard CORS config before adding any auth endpoint. Lock to explicit origins (dev: `http://localhost:5173`, production: your actual domain):
+
+```typescript
+fastify.register(cors, {
+  origin: process.env.FRONTEND_URL,  // explicit, not '*'
+  credentials: true,                  // required for cookies
+});
+```
+
+**Phase to address:** Phase 1 (Auth infrastructure setup) — must precede any auth endpoint work
+
+---
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Fastify server bootstrap | Auth plugin encapsulation (A1) | Register auth plugins at root with `fastify-plugin` |
+| Database schema design | Missing `expires_at`/`refresh_token` columns (B5, C3) | Add all token lifecycle columns in initial migration |
+| Email/password registration | Weak password hashing (C1) | Use `argon2id`; salt is automatic |
+| Session management | Shared reference in `decorateRequest` (A2) | Initialize decorators with `null`; populate in hooks |
+| Google OAuth | State parameter missing (B1), no PKCE (B2) | Implement both before testing any OAuth flow |
+| TikTok OAuth | `client_key` parameter (A4), no localhost redirect (A4) | Manual token exchange; Cloudflare Tunnel for dev |
+| Instagram OAuth | Wrong API entirely (A3) | Use Instagram Login API, not Basic Display API |
+| Account linking | Email-based auto-link vulnerability (A5) | Link by `provider + provider_user_id` only |
+| Migration workflow | `drizzle-kit push` in production (A6) | Use `generate` + `migrate` from day one |
+| Frontend feed gating | Auth state loading flicker (B6) | Three-state auth guard: loading/auth/unauth |
+| Token storage | localStorage XSS exposure (A7) | Access token in memory; refresh token in httpOnly cookie |
+| Existing v1.0 CORS config | Wildcard CORS breaks credentialed requests (C4) | Update CORS config before first auth endpoint |
+| Error handling | Inconsistent error shapes (B7) | Set global Fastify error handler before adding auth routes |
+
+---
+
+## Sources
+
+- [Fastify Encapsulation Reference](https://fastify.dev/docs/latest/Reference/Encapsulation/) — HIGH confidence, official
+- [Fastify Decorators Reference](https://fastify.dev/docs/latest/Reference/Decorators/) — HIGH confidence, official
+- [FSTDEP006 decorateRequest reference type issue](https://github.com/fastify/fastify-request-context/issues/76) — HIGH confidence, official Fastify repo
+- [Update on Instagram Basic Display API — Meta for Developers blog](https://developers.facebook.com/blog/post/2024/09/04/update-on-instagram-basic-display-api/) — HIGH confidence, official
+- [Instagram API with Instagram Login — Meta developer docs](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/) — HIGH confidence, official
+- [TikTok OAuth User Access Token Management](https://developers.tiktok.com/doc/oauth-user-access-token-management) — HIGH confidence, official
+- [TikTok Login Kit for Web](https://developers.tiktok.com/doc/login-kit-web/) — HIGH confidence, official
+- [TikTok Sandbox Mode introduction](https://developers.tiktok.com/blog/introducing-sandbox) — HIGH confidence, official
+- [OAuth Vulnerabilities and Misconfigurations — Descope](https://www.descope.com/blog/post/5-oauth-misconfigurations) — MEDIUM confidence, verified against OWASP
+- [Lessons in safe identity linking — WorkOS](https://workos.com/blog/lessons-in-safe-identity-linking) — MEDIUM confidence
+- [Millions at Risk Due to Google's OAuth Flaw — Truffle Security](https://trufflesecurity.com/blog/millions-at-risk-due-to-google-s-oauth-flaw) — MEDIUM confidence
+- [OWASP CSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html) — HIGH confidence, official
+- [React Authentication: How to Store JWT in a Cookie — Medium/Chenkie](https://medium.com/@ryanchenkie_40935/react-authentication-how-to-store-jwt-in-a-cookie-346519310e81) — MEDIUM confidence
+- [Drizzle ORM `push` documentation](https://orm.drizzle.team/docs/drizzle-kit-push) — HIGH confidence, official (notes dev-only use)
+- [Drizzle ORM Migrations](https://orm.drizzle.team/docs/migrations) — HIGH confidence, official
+- [What is PKCE and Why Your OAuth Implementation Needs It — OneUptime](https://oneuptime.com/blog/post/2025-12-16-what-is-pkce-and-why-you-need-it/view) — MEDIUM confidence
+- [Password Hashing Guide 2025: Argon2 vs Bcrypt](https://guptadeepak.com/the-complete-guide-to-password-hashing-argon2-vs-bcrypt-vs-scrypt-vs-pbkdf2-2026/) — MEDIUM confidence
+
+---
+
+# Part 2: v1.0 — Video Player Pitfalls
+
+*(Preserved from original research — 2026-04-01)*
 
 ---
 
@@ -247,7 +783,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## Technical Debt Patterns
+## Technical Debt Patterns (v1.0)
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
@@ -261,7 +797,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## Integration Gotchas
+## Integration Gotchas (v1.0)
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
@@ -273,7 +809,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## Performance Traps
+## Performance Traps (v1.0)
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
@@ -285,7 +821,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## Security Mistakes
+## Security Mistakes (v1.0)
 
 | Mistake | Risk | Prevention |
 |---------|------|------------|
@@ -296,7 +832,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## UX Pitfalls
+## UX Pitfalls (v1.0)
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
@@ -310,7 +846,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## "Looks Done But Isn't" Checklist
+## "Looks Done But Isn't" Checklist (v1.0)
 
 - [ ] **Autoplay on mobile:** Test on a real iPhone in Safari — not the simulator, not desktop. The simulator uses macOS scroll physics and does not replicate iOS autoplay policy.
 - [ ] **Range requests:** Open DevTools Network tab, load a video, click to seek — verify the server returns `206 Partial Content` with a `Content-Range` header.
@@ -324,7 +860,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## Recovery Strategies
+## Recovery Strategies (v1.0)
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
@@ -338,7 +874,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## Pitfall-to-Phase Mapping
+## Pitfall-to-Phase Mapping (v1.0)
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
@@ -356,7 +892,7 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-## Sources
+## Sources (v1.0)
 
 - [New `<video>` Policies for iOS — WebKit official blog](https://webkit.org/blog/6784/new-video-policies-for-ios/) — HIGH confidence, authoritative
 - [Video playback best practices 2025 — Mux](https://www.mux.com/articles/best-practices-for-video-playback-a-complete-guide-2025) — MEDIUM confidence
@@ -376,5 +912,5 @@ Also implement Page Visibility API to pause all videos when the tab is backgroun
 
 ---
 
-*Pitfalls research for: mobile-first short-form vertical video player (Goonster)*
-*Researched: 2026-04-01*
+*Last updated: 2026-04-02 — v1.1 auth/OAuth/PostgreSQL pitfalls added*
+*Original v1.0 video player pitfalls: 2026-04-01*

@@ -1,183 +1,238 @@
-# Feature Research
+# Feature Landscape: User Authentication, OAuth & Profile
 
-**Domain:** Short-form vertical video player / friend-curated aggregator
-**Researched:** 2026-04-01
-**Confidence:** HIGH (player UX) / MEDIUM (social/aggregation layer)
+**Domain:** User authentication, OAuth connected accounts, profile page
+**Milestone:** v1.1 — layered onto existing short-form video player
+**Researched:** 2026-04-02
+**Confidence:** HIGH (email/password auth, Google OAuth, session patterns) / MEDIUM (TikTok/Instagram OAuth) / LOW (Instagram personal account flows)
 
-## Feature Landscape
+---
 
-### Table Stakes (Users Expect These)
+## Table Stakes
 
-Features that define the category. Missing any of these and the product feels broken or half-built.
+Features users expect when an app has accounts. Missing any of these makes the product feel unfinished or untrustworthy.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Fullscreen vertical playback | TikTok/Reels established this as the default format — any other layout feels wrong | LOW | Use `playsinline` on iOS, 9:16 aspect ratio, `object-fit: cover` |
-| Autoplay on load | First video must start immediately — waiting for a tap breaks the immersion | LOW | Must be muted by default; browsers block unmuted autoplay universally |
-| Muted by default with visible unmute | Browser policy forces muted autoplay; unmute CTA is how users opt into sound | LOW | Prominent mute/unmute button on video overlay; remember state per-session |
-| Swipe-to-next navigation | Vertical swipe is the core gesture vocabulary of the format; any other nav feels alien | MEDIUM | Requires touch gesture detection, snap scrolling, and preload of next video |
-| Looping playback | Short videos are meant to loop; no loop = dead end that kills engagement | LOW | `loop` attribute on `<video>` element, or manual re-seek on `ended` event |
-| Smooth snap-scroll between videos | Partial scroll and snap to next/previous is what separates this from a list of embeds | MEDIUM | CSS scroll-snap or custom gesture handler; must feel instant, not janky |
-| Buffering/loading state indicator | Users need to see the video is loading, not broken | LOW | Spinner or skeleton overlay during `waiting` events |
-| Video progress indicator | Thin bar at bottom showing elapsed time; short-form users glance at it constantly | LOW | Simple progress bar; full scrub control is NOT required for short-form |
-| Basic play/pause on tap | Tap center to pause/play is expected behavior from every major platform | LOW | Single tap on video body toggles playback |
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| Email + password registration | Foundational; users who don't want OAuth must have a fallback | LOW | PostgreSQL users table, Argon2id hashing | Collect email, display name, password. No username field needed at this stage. |
+| Email + password login | Pairs with registration; table stakes for any auth system | LOW | users table, session/token management | Return session cookie on success. |
+| Secure password hashing | Non-negotiable for user trust and legal liability | LOW | argon2 npm package | Use Argon2id (2025 OWASP recommendation) over bcrypt. Negligible complexity difference. |
+| Session persistence across page reloads | Users expect to stay logged in without re-entering credentials | LOW | @fastify/secure-session or DB-backed session | httpOnly, Secure, SameSite=Lax cookies. |
+| Logout | Users must be able to end their session | LOW | Session invalidation on server | Clear server-side session on logout, not just client cookie. |
+| Auth-gated feed | The existing video feed must require login | LOW | ProtectedRoute wrapper in React | Redirect unauthenticated users to /login; preserve intended URL for post-login redirect. |
+| Post-login redirect to intended page | If user hits a protected route then logs in, return them to where they came from | LOW | React Router state param or localStorage | Standard pattern; feels broken when absent. |
+| CSRF protection on state-mutating endpoints | Required when using cookie-based sessions | LOW | @fastify/csrf-protection | SameSite=Lax provides partial CSRF mitigation; explicit CSRF token for non-GET requests if SameSite=None is needed. |
+| Google OAuth login | Google is universal; users strongly prefer "Continue with Google" over form filling | MEDIUM | @fastify/oauth2 or manual PKCE flow, users + oauth_accounts tables | PKCE + state param required. Google requires client_secret even with PKCE for Web Application types. |
+| Connected accounts UI | Users who link OAuth providers need to see what's connected | LOW | oauth_accounts table, profile page | Show provider name + connected account email/handle, with Unlink button. |
+| Basic profile page | Where the user sees and manages their account | LOW | Auth session, connected accounts data | Display name, email (read-only), connected accounts list. No avatar upload needed at this stage. |
 
-### Differentiators (Competitive Advantage)
+---
 
-These features align with the core value proposition — anti-algorithm, friend-curated — and are where Goonster competes.
+## Differentiators
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Friend-curated feed (no algorithm) | Core identity: what you watch was chosen by people you trust, not optimized for engagement time | HIGH | Requires social graph, sharing mechanics, and curation layer; v1 defers this via static files |
-| Cross-platform aggregation (TikTok + Reels + Shorts in one feed) | Eliminates platform-switching; one place for all short-form content friends share | HIGH | Requires video extraction per-platform; complex and fragile (TikTok rate-limits aggressively) |
-| Finite/intentional feed | Visible end-of-feed state with clear count; users know when they've seen everything their friends shared | LOW | Counterintuitively rare; deeply aligned with anti-algorithm positioning |
-| "Who shared this" attribution | Every video shows which friend submitted it; builds social context around content | MEDIUM | Requires user accounts and sharing graph; deferred past v1 |
-| Minimal, non-distracting UI chrome | Keep overlay controls sparse; let the video breathe | LOW | No like counts, no trending badges, no recommendation carousels |
-| Auto-advance with friend context | When auto-advancing, show "from [friend]" as each video loads | LOW | Low-effort once social graph exists; high perceived value |
-| Session awareness / soft stopping cues | Optional: show "You've watched N videos" nudge; respects user autonomy without manipulation | LOW | Align with anti-algorithm ethos; not a dark-pattern auto-pause |
+Features that go beyond what's strictly expected, adding real value for this specific product.
 
-### Anti-Features (Commonly Requested, Often Problematic)
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| TikTok OAuth connect | Connects the user's TikTok identity — foundational for future content aggregation | HIGH | TikTok developer app (staging works for dev; production requires app review) | App review requires a live, non-personal app with demo video. 1-14 day approval. In v1.1, only store the token — don't pull content yet. |
+| Instagram OAuth connect | Connects Instagram identity for future Reels aggregation | HIGH | Meta developer app, Instagram API with Instagram Login (Basic Display API is dead as of Dec 2024) | Personal accounts NOT supported post-Dec 2024. Professional (Business/Creator) accounts only. This is a known blocker for personal-use aggregation — flag for product decision. |
+| Display name editable on profile | Users can set how their name appears to friends | LOW | PATCH /api/users/me, users table display_name column | Simple text input with save button. Critical for "who shared this" future feature. |
+| OAuth account conflict resolution | If user signs up with email then tries to link the same Google account someone else already connected, show a clear error | MEDIUM | Unique constraint on (provider, provider_user_id) in oauth_accounts | Prevents silent account merge bugs. |
+| Graceful OAuth error handling | TikTok and Instagram OAuth flows can fail for many reasons (denied, app not approved, token expired); show clear, human-readable errors | LOW | Error state in OAuth callback handler | Most apps show a generic 500; doing this well is rare and builds trust. |
 
-Features to explicitly avoid. Many will feel natural to add — resist.
+---
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| Algorithmic recommendation | "Discover new content" is a real user need | Directly contradicts core value proposition; once added, it defines the product | Let friend network be the discovery mechanism |
-| Like / reaction counts | Familiar engagement signal from every competitor | Introduces performance anxiety, optimizes for virality not quality, pollutes what friends share | "Saved" or private bookmark for personal use only |
-| Trending / explore section | Adds content surface area beyond friend feed | Pulls in algorithmic or popularity-ranked content; undermines anti-algorithm identity | If needed: "Popular in your friend group" (social graph scoped only) |
-| Unmuted autoplay | Feels more immersive | Universally blocked by browsers and violates user trust; causes immediate bounces | Muted autoplay + prominent, persistent unmute button |
-| Infinite scroll without end state | Keeps session going, familiar pattern | Removes the intentional-viewing experience; becomes the thing the product opposes | Show end-of-feed state: "That's everything your friends shared" |
-| Comment threads per video | Expected social feature | Adds moderation burden, creates engagement optimization pressure, scope explosion | Reaction or emoji-only response; or defer entirely |
-| Push notifications for every share | Drives re-engagement | Notification fatigue; turns the app into an attention vampire | Digest: "Your friends shared 5 videos since you last checked" |
-| Video upload / original content creation | Feels like natural extension | Pivots product from curation to creation; different product, different users | Stay pure: Goonster aggregates, platforms create |
+## Anti-Features
+
+Features to explicitly not build in this milestone.
+
+| Anti-Feature | Why It Gets Requested | Why to Avoid | What to Do Instead |
+|--------------|----------------------|--------------|-------------------|
+| Email verification flow | "You should verify emails" — true for production scale | Adds a full async flow (send email, expiring token, verify page) that's not blocking any v1.1 feature. The feed is still static files — no user-generated content risk yet. | Add a `email_verified` boolean column to the DB now (default false), but skip sending verification emails. Build the flow in a later milestone when the stakes justify it. |
+| Password reset / forgot password | Users will ask for it | Requires email delivery infrastructure (SMTP / transactional email service). Zero-dependency email sending is not trivial to do well. | Mark `password_reset_token` column as future. Deferred until email infrastructure is in place. |
+| Two-factor authentication (2FA/TOTP) | Security-conscious users want it | Real implementation complexity; TOTP requires secure QR code generation, recovery codes, and a smooth UX. Adds significant scope for a feature the v1.1 target user (developer/friend group) doesn't need yet. | Defer. Schema should not preclude adding it later (users table: `totp_secret nullable`). |
+| Avatar / profile photo upload | Makes profiles feel complete | Requires file storage infrastructure (S3 or disk with size limits, image resizing, security validation). Scope explosion for no v1.1 product value. | Show initials-based avatar derived from display name. Use Google profile photo if connected. |
+| Public profile pages | Social products have these | v1.1 has no social graph. Public profiles with no friends/content to show are meaningless. | Profile page is private/authenticated only. |
+| Username (slug) for profiles | Users expect it from social apps | Adds uniqueness validation, URL routing, character restriction logic, and future conflict management. Not needed until profiles are public or shareable. | Use UUID or numeric ID for user-scoped URLs internally. |
+| Role-based access control (RBAC) | "We'll need admin eventually" | Premature. All v1.1 users are equal. Adding roles now adds boilerplate with no immediate payoff. | Add a `role` column (default: 'user') to users table, but implement no access control logic on top of it. |
+| Social login as the only option | Some apps drop email/password to simplify | Locks out users whose Google/TikTok accounts get banned or suspended; creates platform dependency. | Email/password is always the fallback. OAuth is additive, not exclusive. |
+| Refresh token rotation visible to frontend | "Best practice for JWTs" | If using httpOnly cookie sessions (recommended), the frontend never touches tokens. Rotation complexity belongs server-side only. | Let @fastify/secure-session or @fastify/session handle session lifecycle server-side. |
+
+---
 
 ## Feature Dependencies
 
 ```
-[Video Player Core]
-    ├──requires──> [Autoplay + Muted]
-    ├──requires──> [Swipe Gesture Handler]
-    │                   └──requires──> [Preload Next Video]
-    ├──requires──> [Progress Bar]
-    └──requires──> [Loop / Auto-advance]
+[Auth Gate on Feed]
+    └──requires──> [Session Management]
+                       └──requires──> [Login / Registration endpoints]
+                                          └──requires──> [PostgreSQL users table]
+                                          └──requires──> [Argon2id hashing]
 
-[Friend-Curated Feed]
-    └──requires──> [User Accounts + Auth]
-                       └──requires──> [Social Graph (follow/friend)]
-                                           └──requires──> [Share Submission UI]
-                                                              └──requires──> [Video Extraction]
-                                                                                 └──requires──> [Platform API / Scraper per platform]
+[Google OAuth Connect]
+    └──requires──> [oauth_accounts table]
+    └──requires──> [OAuth callback endpoint in Fastify]
+    └──requires──> [PKCE + state param generation]
+    └──requires──> [Session (user must be logged in to link, OR auto-register on first OAuth login)]
 
-[Video Extraction]
-    ├──requires──> [TikTok extraction] (highest complexity, fragile)
-    ├──requires──> [Instagram Reels extraction] (restrictive API, scraper needed)
-    └──requires──> [YouTube Shorts extraction] (most stable: YouTube Data API v3 exists)
+[TikTok OAuth Connect]
+    └──requires──> [oauth_accounts table]
+    └──requires──> [TikTok developer app (staging for dev, app review for production)]
+    └──requires──> [OAuth callback endpoint]
+    NOTE: Staging sandbox works for development without app review.
+          Production use requires 1-14 day TikTok app review.
+          App must NOT be for personal use — TikTok policy blocks this.
 
-[Finite Feed / End-of-Feed State]
-    └──requires──> [Known video count] (trivial with static files in v1)
+[Instagram OAuth Connect]
+    └──requires──> [oauth_accounts table]
+    └──requires──> [Meta developer app]
+    └──requires──> [User has Professional (Business/Creator) Instagram account]
+    BLOCKER: Instagram Basic Display API was killed Dec 4, 2024.
+             Personal Instagram accounts can no longer connect to third-party apps.
+             Only Business/Creator professional accounts work.
+             This directly conflicts with Goonster's target user (personal friends).
+             Product decision needed before building this.
 
-[Who Shared This Attribution]
-    └──requires──> [User Accounts + Auth]
-    └──requires──> [Social Graph]
+[Profile Page]
+    └──requires──> [Auth session (logged-in user only)]
+    └──requires──> [Connected accounts read endpoint]
+    └──can display──> [Google profile photo if oauth_accounts has google token]
+    └──optional──> [Display name edit endpoint]
+
+[Unlink Provider]
+    └──requires──> [At least one other auth method remains (prevent lockout)]
+    └──requires──> [DELETE /api/users/me/accounts/:provider]
 ```
 
-### Dependency Notes
+---
 
-- **Video Player Core has no dependencies on social features.** This is why v1 can ship with static files — the player is a self-contained unit.
-- **Friend-curated feed requires auth before anything social works.** Auth is the unlock for the entire social layer.
-- **Video extraction is the highest-risk dependency.** TikTok and Instagram aggressively rate-limit and block scraping; this work should be isolated and treated as an integration problem, not a product feature until stable.
-- **YouTube Shorts is the safest extraction path** — YouTube Data API v3 provides legitimate video data access; use this first in future milestones.
-- **Finite feed enhances but does not require** the anti-algorithm positioning. It can be shipped in v1 trivially (static file count is always known).
+## MVP Recommendation for v1.1
 
-## MVP Definition
+### Build in v1.1
 
-### Launch With (v1 — Milestone 1)
+1. **Email/password registration + login** — users table, Argon2id, session cookie
+2. **Server-side session management** — @fastify/secure-session (stateless encrypted cookie) or @fastify/session with PostgreSQL store
+3. **Auth-gated feed** — ProtectedRoute wrapper in React, 401 → redirect to /login with return URL
+4. **Logout** — server-side session invalidation
+5. **Google OAuth login/signup + connect** — PKCE flow, oauth_accounts table, auto-register new users
+6. **TikTok OAuth connect (staging only)** — implement the full flow in dev/staging; production approval needed separately
+7. **Instagram OAuth connect (flag blocker)** — implement the redirect flow, but document that personal account limitation may block the core use case
+8. **Basic profile page** — display name, email, connected accounts list with unlink
+9. **Display name edit** — PATCH /api/users/me
 
-The player experience with static files. Validate the core interaction loop.
+### Defer out of v1.1
 
-- [ ] Fullscreen vertical video player — the product literally doesn't exist without this
-- [ ] Autoplay muted on load — first frame must play immediately
-- [ ] Visible mute/unmute control — required for audio; browsers force this
-- [ ] Swipe up/down to navigate between videos — the defining interaction
-- [ ] Video loops — short-form default; no loop = dead end
-- [ ] Progress bar overlay — users expect temporal context even on short clips
-- [ ] Loading/buffering indicator — prevents "is this broken?" perception
-- [ ] Preload next video — eliminates perceived gap between swipes
-- [ ] Finite feed end state — "You've seen everything" message; aligns with anti-algorithm identity and is free to implement with static files
+- Email verification (add column, skip sending)
+- Password reset (schema placeholder, no email infra)
+- Avatar upload (initials fallback; use Google photo if available)
+- 2FA/TOTP
+- RBAC beyond storing a `role` field
 
-### Add After Validation (v1.x — post player validation)
+---
 
-Add once the player experience is proven solid.
+## Platform OAuth Complexity: Reality Check
 
-- [ ] User authentication — unlock for all social features; add when ready to build social layer
-- [ ] Video link submission (URL ingestion) — let friends share TikTok/Reels/Shorts URLs
-- [ ] YouTube Shorts extraction — safest platform to start with (official API exists)
-- [ ] "Who shared this" attribution on each card — low complexity once auth exists, high value
+### Google OAuth
+**Confidence: HIGH**
+- Well-documented, stable, PKCE supported, OpenID Connect standard
+- client_secret required even with PKCE (Google-specific behavior per RFC 7636 deviation)
+- Redirect URI must be HTTPS (exception: localhost in development)
+- Scopes needed for login: `openid email profile`
+- Token contains: sub (stable user ID), email, name, picture — all you need for identity
 
-### Future Consideration (v2+)
+### TikTok OAuth
+**Confidence: MEDIUM**
+- v2 OAuth API (RFC 6749 compliant) available for web apps
+- access_token expires in 24 hours; refresh token available
+- `user.info.basic` scope added by default on Login Kit
+- Development/sandbox works without app review
+- **Production requires app review**: submit demo video showing full end-to-end flow; apps for "personal use" are explicitly rejected by TikTok policy
+- Timeline: 1-14 days (unofficial), manual review, no guarantees
+- For v1.1: implement the full flow in staging — it works. Ship production TikTok connect in v1.2 post-review.
 
-Defer until product-market fit and social graph are established.
+### Instagram OAuth
+**Confidence: MEDIUM (with HIGH confidence the blocker is real)**
+- Instagram Basic Display API: **dead since December 4, 2024** — no exceptions, no appeals
+- Replacement: Instagram API with Instagram Login (requires Professional account)
+- "Professional account" = Business or Creator type — NOT a regular personal Instagram account
+- The people Goonster targets (friends sharing personal videos) use personal accounts
+- **This is a product-level blocker**, not a technical one
+- Technical implementation (OAuth redirect flow) is straightforward — Meta's OAuth is standard
+- Recommend: implement the OAuth scaffold, display a clear "Professional account required" message on the connect screen, flag for product decision about whether this feature has value
 
-- [ ] TikTok video extraction — high complexity, fragile; worth solving only after YouTube Shorts is stable
-- [ ] Instagram Reels extraction — most restrictive platform; likely requires third-party scraping service
-- [ ] Friend invitation / social graph — requires trust and UX investment; do this deliberately
-- [ ] Digest notifications — "N new videos from friends" — only after retention data shows value
-- [ ] Mobile app wrapping (Capacitor/React Native) — web must be solid first
+---
 
-## Feature Prioritization Matrix
+## Database Schema Implications
 
-| Feature | User Value | Implementation Cost | Priority |
-|---------|------------|---------------------|----------|
-| Fullscreen vertical player | HIGH | LOW | P1 |
-| Autoplay muted | HIGH | LOW | P1 |
-| Swipe navigation | HIGH | MEDIUM | P1 |
-| Video loop | HIGH | LOW | P1 |
-| Progress bar | MEDIUM | LOW | P1 |
-| Buffering indicator | MEDIUM | LOW | P1 |
-| Preload next video | HIGH | MEDIUM | P1 |
-| End-of-feed state | MEDIUM | LOW | P1 |
-| Mute/unmute control | HIGH | LOW | P1 |
-| User authentication | HIGH | MEDIUM | P2 |
-| URL submission / link sharing | HIGH | MEDIUM | P2 |
-| "Who shared this" attribution | HIGH | LOW (post-auth) | P2 |
-| YouTube Shorts extraction | HIGH | MEDIUM | P2 |
-| TikTok extraction | HIGH | HIGH | P3 |
-| Instagram Reels extraction | HIGH | HIGH | P3 |
-| Digest notifications | MEDIUM | MEDIUM | P3 |
-| Native app wrapper | MEDIUM | HIGH | P3 |
+These tables are required to implement all v1.1 features above.
 
-**Priority key:**
-- P1: Must have for v1 launch
-- P2: Add after core player is validated
-- P3: Future consideration, defer until PMF
+```sql
+-- Core user identity
+CREATE TABLE users (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email       TEXT UNIQUE NOT NULL,
+    display_name TEXT NOT NULL,
+    password_hash TEXT,              -- nullable: users who only use OAuth have no password
+    email_verified BOOLEAN NOT NULL DEFAULT false,  -- reserved for future email verification
+    role        TEXT NOT NULL DEFAULT 'user',       -- reserved for future RBAC
+    totp_secret TEXT,                               -- reserved for future 2FA
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-## Competitor Feature Analysis
+-- OAuth provider connections (one row per provider per user)
+CREATE TABLE oauth_accounts (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    provider        TEXT NOT NULL,           -- 'google' | 'tiktok' | 'instagram'
+    provider_user_id TEXT NOT NULL,          -- stable ID from the provider
+    access_token    TEXT,                    -- encrypted at rest
+    refresh_token   TEXT,                    -- encrypted at rest
+    token_expires_at TIMESTAMPTZ,
+    raw_profile     JSONB,                   -- store full provider profile for future use
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(provider, provider_user_id)       -- prevents duplicate connections
+);
 
-| Feature | TikTok | Instagram Reels | YouTube Shorts | Goonster Approach |
-|---------|--------|-----------------|----------------|-------------------|
-| Feed curation | Algorithm (For You) | Algorithm | Algorithm | Friend-submitted only — no algorithm |
-| Content source | Original uploads | Original uploads | Original uploads | Aggregates links from all three platforms |
-| Autoplay | Yes, muted | Yes, muted | Yes, muted | Yes, muted — standard |
-| Swipe navigation | Yes, vertical | Yes, vertical | Yes, vertical | Yes, vertical — standard |
-| Loop | Yes | Yes | Yes | Yes — standard |
-| Like counts | Yes, public | Yes, public | Yes, public | Deliberately absent in v1 |
-| Comment threads | Yes | Yes | Yes | Deliberately absent in v1 |
-| End-of-feed | No — infinite | No — infinite | No — infinite | Yes — intentional; counter-positioning |
-| Cross-platform | No | No | No | Yes — core differentiator |
-| Social graph | Follows/followers | Follows/followers | Subscriptions | Friend-only; no public follower counts |
-| Trending/Discover | Yes, prominent | Yes, prominent | Yes, prominent | No — explicitly excluded |
+-- Server-side sessions (if using DB-backed sessions over stateless cookies)
+-- Only needed if NOT using @fastify/secure-session stateless cookies
+CREATE TABLE sessions (
+    id          TEXT PRIMARY KEY,            -- random session token
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    data        JSONB,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+**Schema notes:**
+- `password_hash` is nullable to support OAuth-only users (no password set)
+- `oauth_accounts.access_token` and `refresh_token` must be encrypted at rest — store encrypted with a server-side key, not plaintext
+- `UNIQUE(provider, provider_user_id)` prevents the same TikTok/Google/Instagram account from being linked to two different Goonster users
+- `raw_profile JSONB` lets you store the full provider response without schema migrations later (user's name, profile picture URL, etc.)
+
+---
 
 ## Sources
 
-- Mux: Best Practices for Video Playback (2025) — https://www.mux.com/articles/best-practices-for-video-playback-a-complete-guide-2025
-- Vidzflow: Mastering Video Player Controls UX — https://www.vidzflow.com/blog/mastering-video-player-controls-ux-best-practices
-- Adspyder: UX Design for Video Content (2026) — https://adspyder.io/blog/ux-design-for-video-content/
-- Letterboxd design analysis (friend-feed without algorithm): https://blakecrosley.com/guides/design/letterboxd
-- Bloomberg/BNN: Strava and Letterboxd surge on anti-algorithm demand — https://www.bnnbloomberg.ca/business/2024/08/31/strava-and-letterboxd-surge-as-users-crave-social-media-refuge/
-- Medium/Rene Otto: Autoplay and infinite scroll as dark patterns — https://rene-otto.medium.com/autoplay-and-infinite-scroll-8607abe52bb7
-- Scrapfly: Social Media Scraping complexity 2026 — https://scrapfly.io/blog/posts/social-media-scraping
-- MDN Web Docs: Video buffering and time ranges — https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Audio_and_video_delivery/buffering_seeking_time_ranges
+- TikTok Login Kit for Web: https://developers.tiktok.com/doc/login-kit-web/
+- TikTok App Review Guidelines: https://developers.tiktok.com/doc/app-review-guidelines
+- TikTok Scopes Overview: https://developers.tiktok.com/doc/scopes-overview
+- Instagram Basic Display API deprecation notice: https://developers.facebook.com/blog/post/2024/09/04/update-on-instagram-basic-display-api/
+- Instagram Platform Overview (2025): https://developers.facebook.com/docs/instagram-platform/overview/
+- Meta Instagram OAuth Authorize: https://developers.facebook.com/docs/instagram-platform/reference/oauth-authorize/
+- Google OAuth 2.0 for Web: https://developers.google.com/identity/protocols/oauth2
+- Google OAuth Best Practices: https://developers.google.com/identity/protocols/oauth2/resources/best-practices
+- PKCE on Google (client_secret still required for Web Application type): https://ktaka.blog.ccmp.jp/2025/07/oogle-oauth2-and-pkce-understanding.html
+- Password hashing comparison 2025 (Argon2id recommendation): https://guptadeepak.com/the-complete-guide-to-password-hashing-argon2-vs-bcrypt-vs-scrypt-vs-pbkdf2-2026/
+- Fastify secure session (stateless encrypted cookie): https://github.com/fastify/fastify-secure-session
+- Fastify session plugin: https://github.com/fastify/session
+- Fastify CSRF protection: https://github.com/fastify/csrf-protection
+- Auth0: User Account Linking patterns: https://auth0.com/docs/manage-users/user-accounts/user-account-linking
+- Login & Signup UX best practices 2025: https://www.authgear.com/post/login-signup-ux-guide
+- Protected routes in React Router: https://ui.dev/react-router-protected-routes-authentication
 
 ---
-*Feature research for: short-form video player / friend-curated aggregator (Goonster)*
-*Researched: 2026-04-01*
+
+*Feature research for: v1.1 user authentication, OAuth connected accounts, profile page (Goonster)*
+*Researched: 2026-04-02*
