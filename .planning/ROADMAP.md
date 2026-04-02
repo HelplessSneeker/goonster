@@ -42,7 +42,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 **Plans**: 4 plans
 Plans:
 - [x] 04-01-PLAN.md — PostgreSQL + Drizzle ORM + better-auth backend infrastructure, Wave 0 test stubs
-- [ ] 04-02-PLAN.md — CORS credentials fix, auth guards on feed/video, Vite proxy, frontend auth client, shared types
+- [x] 04-02-PLAN.md — CORS credentials fix, auth guards on feed/video, Vite proxy, frontend auth client, shared types
 - [ ] 04-03-PLAN.md — Auth UI components, login/register/profile pages, React Router setup, ProtectedRoute, LogoutButton, 401 handler
 - [ ] 04-04-PLAN.md — Backend auth integration tests, end-to-end verification checkpoint
 **UI hint**: yes
@@ -92,7 +92,7 @@ Plans:
 | 1. Backend Foundation | v1.0 | 2/2 | Complete | 2026-04-01 |
 | 2. Video Player Core | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 3. Feed & Navigation | v1.0 | 3/3 | Complete | 2026-04-02 |
-| 4. Database Foundation & Auth Core | v1.1 | 1/4 | In Progress|  |
+| 4. Database Foundation & Auth Core | v1.1 | 2/4 | In Progress|  |
 | 5. Google OAuth & Profile Page | v1.1 | 0/? | Not started | - |
 | 6. TikTok OAuth & Instagram Scaffold | v1.1 | 0/? | Not started | - |
 | 7. Email Delivery & Profile Completion | v1.1 | 0/? | Not started | - |

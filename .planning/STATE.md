@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: User Authentication & Connected Accounts
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-02T22:19:22.226Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-02T22:24:26.557Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 ## Current Position
 
 Phase: 04 (database-foundation-auth-core) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-02
 
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 04 P01 | 3 | 2 tasks | 11 files |
+| Phase 04 P02 | 2 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,8 @@ Progress: [░░░░░░░░░░] 0%
 - Phase 7 depends on Phase 4, not Phase 6 — email delivery is independent of OAuth providers
 - [Phase 04]: Zod v3 intentionally retained for backend route validation — better-auth bundles its own zod v4 internally, no runtime conflict; upgrading would break existing z.coerce.number() usage in feed.ts
 - [Phase 04]: describe.skipIf(!DATABASE_URL) used for auth integration tests — prevents CI failures on environments without PostgreSQL
+- [Phase 04]: Frontend better-auth client uses explicit baseURL (http://localhost:3000) — production-portable, Vite proxy covers dev
+- [Phase 04]: react-router installed in Plan 02 ahead of use — Plan 03 requires it for routing setup
 
 ### Pending Todos
 
@@ -83,6 +86,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T22:19:22.223Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-02T22:24:26.554Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
