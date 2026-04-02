@@ -71,13 +71,34 @@ Requirements for User Authentication & Connected Accounts milestone. Each maps t
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | — |
+| INFRA-01 | Phase 4 | Pending |
+| INFRA-02 | Phase 4 | Pending |
+| INFRA-03 | Phase 4 | Pending |
+| INFRA-05 | Phase 4 | Pending |
+| AUTH-01 | Phase 4 | Pending |
+| AUTH-02 | Phase 4 | Pending |
+| AUTH-03 | Phase 4 | Pending |
+| AUTH-04 | Phase 4 | Pending |
+| OAUTH-01 | Phase 5 | Pending |
+| OAUTH-02 | Phase 5 | Pending |
+| OAUTH-05 | Phase 5 | Pending |
+| PROF-01 | Phase 5 | Pending |
+| PROF-02 | Phase 5 | Pending |
+| OAUTH-03 | Phase 6 | Pending |
+| OAUTH-04 | Phase 6 | Pending |
+| AUTH-05 | Phase 7 | Pending |
+| AUTH-06 | Phase 7 | Pending |
+| AUTH-07 | Phase 7 | Pending |
+| INFRA-04 | Phase 7 | Pending |
+| PROF-03 | Phase 7 | Pending |
+| PROF-04 | Phase 7 | Pending |
+| PROF-05 | Phase 7 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20 ⚠️
+- v1.1 requirements: 22 total (7 AUTH + 5 OAUTH + 5 PROF + 5 INFRA)
+- Mapped to phases: 22
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after initial definition*
+*Last updated: 2026-04-02 after roadmap creation*

@@ -7,7 +7,7 @@ stopped_at: null
 last_updated: "2026-04-02T14:00:00.000Z"
 last_activity: 2026-04-02
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,21 +21,41 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** A vertical-swipe video feed that plays content your friends chose to share — no algorithm, just people you trust.
-**Current focus:** Defining requirements for v1.1
+**Current focus:** Phase 4 — Database Foundation & Auth Core
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-02 — Milestone v1.1 started
+Phase: 4 of 7 (Database Foundation & Auth Core)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-04-02 — Roadmap created for v1.1
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0 (v1.1)
+- Average duration: — (no data yet)
+- Total execution time: 0 hours
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
+
+*Updated after each plan completion*
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-See: `.planning/milestones/v1.0-ROADMAP.md` for v1.0-era decisions.
+- Use better-auth 1.5.x (not passport + session stack) — replaces 4-5 separate packages
+- Database-backed sessions via better-auth (not stateless JWTs) — server-side invalidation required
+- Stay on drizzle-orm 0.45.x — v1.0.0-beta breaks better-auth adapter (issue #6766)
+- Google OAuth first — no app review, localhost works; TikTok/Instagram deferred to Phase 6
+- Phase 7 depends on Phase 4, not Phase 6 — email delivery is independent of OAuth providers
 
 ### Pending Todos
 
@@ -43,7 +63,9 @@ None.
 
 ### Blockers/Concerns
 
-None.
+- Instagram personal account OAuth blocked since Dec 2024 (Basic Display API dead). Phase 6 scaffolds the UI with "Professional account required" messaging; product decision on full support deferred.
+- TikTok production app review has unpredictable timeline (1-14 days, personal-use apps explicitly rejected by policy). Phase 6 implements staging/sandbox only.
+- CORS must be fixed (INFRA-05) before any auth endpoint is wired — Phase 4, first task.
 
 ### Quick Tasks Completed
 
@@ -51,12 +73,12 @@ None.
 |---|-------------|------|--------|-----------|
 | 260402-cj4 | create a readme file | 2026-04-02 | 7bf64f3 | [260402-cj4-create-a-readme-file](./quick/260402-cj4-create-a-readme-file/) |
 | 260402-ewv | add a script to the monorepo root to start the whole application | 2026-04-02 | 96d0b6a | [260402-ewv-add-a-script-to-the-monorepo-root-to-sta](./quick/260402-ewv-add-a-script-to-the-monorepo-root-to-sta/) |
-| 260402-g05 | fix documentation metadata debt — correct metadata.json size, ROADMAP/STATE accuracy, SUMMARY requirements-completed | 2026-04-02 | 6847381 | [260402-g05-fix-the-documentation-metadata-debt-chec](./quick/260402-g05-fix-the-documentation-metadata-debt-chec/) |
+| 260402-g05 | fix documentation metadata debt | 2026-04-02 | 6847381 | [260402-g05-fix-the-documentation-metadata-debt-chec](./quick/260402-g05-fix-the-documentation-metadata-debt-chec/) |
 | 260402-gl5 | update REQUIREMENTS.md — mark 6 pending v1 requirements as complete | 2026-04-02 | 7755693 | [260402-gl5-update-requirements-md-the-6-pending-com](./quick/260402-gl5-update-requirements-md-the-6-pending-com/) |
-| 260402-hc2 | clean up medium tech debt — DiskVideoStore safety, logging, shared exports, error envelopes | 2026-04-02 | fdb44b0 | [260402-hc2-clean-up-medium-tech-debt-diskvideostore](./quick/260402-hc2-clean-up-medium-tech-debt-diskvideostore/) |
+| 260402-hc2 | clean up medium tech debt | 2026-04-02 | fdb44b0 | [260402-hc2-clean-up-medium-tech-debt-diskvideostore](./quick/260402-hc2-clean-up-medium-tech-debt-diskvideostore/) |
 
 ## Session Continuity
 
 Last session: 2026-04-02
-Stopped at: Milestone v1.1 requirements definition
+Stopped at: Roadmap created for v1.1 — ready to plan Phase 4
 Resume file: None
