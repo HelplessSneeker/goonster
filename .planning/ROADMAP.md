@@ -61,7 +61,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 03-01-PLAN.md — Install swiper+zustand, create feedStore, upgrade feedApi to cursor pagination, create useFeed hook, refactor useVideoPlayer mute state
-- [ ] 03-02-PLAN.md — Feed components (FeedContainer, FeedSlide, BufferingSpinner, EndOfFeedSlide), App.tsx wiring, component tests
+- [x] 03-02-PLAN.md — Feed components (FeedContainer, FeedSlide, BufferingSpinner, EndOfFeedSlide), App.tsx wiring, component tests
 - [ ] 03-03-PLAN.md — Human verification checkpoint: desktop and mobile device testing
 **UI hint**: yes
 
@@ -74,4 +74,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Backend Foundation | 2/2 | Complete   | 2026-04-01 |
 | 2. Video Player Core | 2/3 | In Progress|  |
-| 3. Feed & Navigation | 1/3 | In Progress|  |
+| 3. Feed & Navigation | 2/3 | In Progress|  |
