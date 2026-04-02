@@ -18,7 +18,7 @@ describe('Feed API (API-02, API-03, API-04)', () => {
 
   beforeAll(async () => {
     const store = new MockVideoStore(mockItems)
-    const app = buildApp({ store })
+    const app = buildApp({ store, skipAuth: true })
     server = app.server
     await app.ready
     await server.ready()

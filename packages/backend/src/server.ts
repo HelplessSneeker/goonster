@@ -11,7 +11,7 @@ import type { VideoStore } from './store/VideoStore.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export function buildApp(overrides?: { store?: VideoStore }) {
+export function buildApp(overrides?: { store?: VideoStore; skipAuth?: boolean }) {
   const fixturesDir = path.join(__dirname, '../fixtures')
   const store = overrides?.store ?? new DiskVideoStore(
     path.join(fixturesDir, 'videos'),
@@ -38,8 +38,8 @@ export function buildApp(overrides?: { store?: VideoStore }) {
     })
 
     await server.register(authRoutes)
-    await server.register(feedRoutes, { store })
-    await server.register(videoRoutes, { store })
+    await server.register(feedRoutes, { store, skipAuth: overrides?.skipAuth })
+    await server.register(videoRoutes, { store, skipAuth: overrides?.skipAuth })
   })()
 
   return { server, ready }

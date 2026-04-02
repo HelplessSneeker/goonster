@@ -13,16 +13,18 @@ import type { VideoStore } from '../store/VideoStore.js'
 
 export async function videoRoutes(
   fastify: FastifyInstance,
-  options: { store: VideoStore },
+  options: { store: VideoStore; skipAuth?: boolean },
 ) {
-  fastify.addHook('preHandler', async (request, reply) => {
-    const session = await auth.api.getSession({
-      headers: fromNodeHeaders(request.headers),
+  if (!options.skipAuth) {
+    fastify.addHook('preHandler', async (request, reply) => {
+      const session = await auth.api.getSession({
+        headers: fromNodeHeaders(request.headers),
+      })
+      if (!session) {
+        reply.status(401).send({ error: 'Unauthorized' })
+      }
     })
-    if (!session) {
-      reply.status(401).send({ error: 'Unauthorized' })
-    }
-  })
+  }
 
   // Individual video metadata endpoint
   fastify.get('/video/:id/meta', async (request, reply) => {
