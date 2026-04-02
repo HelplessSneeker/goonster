@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "pnpm --filter backend dev & pnpm --filter frontend dev",
     "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
     "test": "pnpm --filter backend test --run",
     "typecheck": "pnpm -r run typecheck"
   }
