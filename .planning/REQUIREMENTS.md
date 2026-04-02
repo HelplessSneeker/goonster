@@ -37,7 +37,7 @@ Requirements for User Authentication & Connected Accounts milestone. Each maps t
 
 - [x] **INFRA-01**: PostgreSQL database with Drizzle ORM schema (users, sessions, accounts, tokens)
 - [x] **INFRA-02**: Video feed requires authentication to view
-- [ ] **INFRA-03**: Client-side routing (login, register, profile, feed pages)
+- [x] **INFRA-03**: Client-side routing (login, register, profile, feed pages)
 - [ ] **INFRA-04**: Transactional email delivery for verification and password reset
 - [x] **INFRA-05**: CORS configuration updated for credentialed requests
 
@@ -73,7 +73,7 @@ Requirements for User Authentication & Connected Accounts milestone. Each maps t
 |-------------|-------|--------|
 | INFRA-01 | Phase 4 | Complete |
 | INFRA-02 | Phase 4 | Complete |
-| INFRA-03 | Phase 4 | Pending |
+| INFRA-03 | Phase 4 | Complete |
 | INFRA-05 | Phase 4 | Complete |
 | AUTH-01 | Phase 4 | Complete |
 | AUTH-02 | Phase 4 | Complete |

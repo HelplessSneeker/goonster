@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: User Authentication & Connected Accounts
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-04-02T22:24:26.557Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-04-02T22:29:53.225Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-02)
 ## Current Position
 
 Phase: 04 (database-foundation-auth-core) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-02
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 04 P01 | 3 | 2 tasks | 11 files |
 | Phase 04 P02 | 2 | 2 tasks | 9 files |
+| Phase 04 P03 | 2 | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 04]: describe.skipIf(!DATABASE_URL) used for auth integration tests — prevents CI failures on environments without PostgreSQL
 - [Phase 04]: Frontend better-auth client uses explicit baseURL (http://localhost:3000) — production-portable, Vite proxy covers dev
 - [Phase 04]: react-router installed in Plan 02 ahead of use — Plan 03 requires it for routing setup
+- [Phase 04]: ProtectedRoute returns null during isPending — black screen prevents feed flash (D-09 auth UI contract)
+- [Phase 04]: email.split('@')[0] as name for signUp.email() — better-auth requires name field, display name deferred to Phase 5
+- [Phase 04]: QueryCache 401 handler uses window.location.href — full page navigation clears all React + Zustand state atomically
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T22:24:26.554Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-02T22:29:53.221Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
