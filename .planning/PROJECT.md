@@ -13,13 +13,14 @@ A vertical-swipe video feed that plays content your friends chose to share — n
 ### Validated
 
 - [x] Backend serves static video files via API — Validated in Phase 01: backend-foundation (HTTP 206 range requests, @fastify/static)
+- [x] Full-screen autoplay and loop for short-form videos — Validated in Phase 02: video-player-core
+- [x] Mobile-first web app with vertical swipe video feed — Validated in Phase 03: feed-navigation
+- [x] Smooth swipe-to-next navigation between videos — Validated in Phase 03: feed-navigation
+- [x] Responsive design optimized for mobile viewports — Validated in Phase 02: video-player-core
 
 ### Active
 
-- [ ] Mobile-first web app with vertical swipe video feed
-- [ ] Full-screen autoplay and loop for short-form videos
-- [ ] Smooth swipe-to-next navigation between videos
-- [ ] Responsive design optimized for mobile viewports
+None — all v1.0 requirements validated.
 
 ### Out of Scope
 
@@ -72,4 +73,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after Phase 01 completion*
+*Last updated: 2026-04-02 after Phase 03 completion — all v1.0 milestone phases complete*
