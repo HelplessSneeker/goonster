@@ -10,16 +10,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@goonster/shared": "workspace:*",
-    "fastify": "^5.8.4",
-    "@fastify/static": "^9.0.0",
     "@fastify/cors": "^11.2.0",
+    "@fastify/static": "^9.0.0",
+    "@goonster/shared": "workspace:*",
+    "better-auth": "^1.5.6",
+    "drizzle-orm": "^0.45.2",
+    "fastify": "^5.8.4",
+    "pg": "^8.20.0",
     "zod": "^3.25.2"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.31.10",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
-    "@types/node": "^25.5.0",
     "vitest": "^4.1.2"
   }
 }
