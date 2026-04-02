@@ -1,5 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { fromNodeHeaders } from 'better-auth/node'
+import { auth } from '../auth.js'
 import type { VideoStore } from '../store/VideoStore.js'
 import { getPage } from '../services/feedService.js'
 
@@ -12,6 +14,15 @@ export async function feedRoutes(
   fastify: FastifyInstance,
   options: { store: VideoStore },
 ) {
+  fastify.addHook('preHandler', async (request, reply) => {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
+    })
+    if (!session) {
+      reply.status(401).send({ error: 'Unauthorized' })
+    }
+  })
+
   fastify.get('/feed', async (request, reply) => {
     const parsed = QuerySchema.safeParse(request.query)
     if (!parsed.success) {

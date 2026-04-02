@@ -7,12 +7,23 @@
 // The client constructs this URL from VideoMeta.filename
 
 import type { FastifyInstance } from 'fastify'
+import { fromNodeHeaders } from 'better-auth/node'
+import { auth } from '../auth.js'
 import type { VideoStore } from '../store/VideoStore.js'
 
 export async function videoRoutes(
   fastify: FastifyInstance,
   options: { store: VideoStore },
 ) {
+  fastify.addHook('preHandler', async (request, reply) => {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
+    })
+    if (!session) {
+      reply.status(401).send({ error: 'Unauthorized' })
+    }
+  })
+
   // Individual video metadata endpoint
   fastify.get('/video/:id/meta', async (request, reply) => {
     const { id } = request.params as { id: string }

@@ -5,6 +5,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { feedRoutes } from './routes/feed.js'
 import { videoRoutes } from './routes/video.js'
+import { authRoutes } from './routes/auth.js'
 import { DiskVideoStore } from './store/DiskVideoStore.js'
 import type { VideoStore } from './store/VideoStore.js'
 
@@ -25,6 +26,9 @@ export function buildApp(overrides?: { store?: VideoStore }) {
       origin: process.env.NODE_ENV === 'production'
         ? ['https://goonster.app']
         : ['http://localhost:5173'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
     })
 
     await server.register(staticPlugin, {
@@ -33,6 +37,7 @@ export function buildApp(overrides?: { store?: VideoStore }) {
       // acceptRanges defaults true — NEVER override to false (breaks iOS Safari)
     })
 
+    await server.register(authRoutes)
     await server.register(feedRoutes, { store })
     await server.register(videoRoutes, { store })
   })()
