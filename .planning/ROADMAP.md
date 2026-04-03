@@ -22,7 +22,7 @@ See: `.planning/milestones/v1.0-ROADMAP.md` for full phase details.
 
 **Milestone Goal:** Add user authentication (email/password + OAuth) with connected accounts architecture for TikTok, Google, and Instagram, gating the existing feed behind login.
 
-- [ ] **Phase 4: Database Foundation & Auth Core** - PostgreSQL schema, CORS fix, email/password auth, sessions, auth-gated feed, client-side routing
+- [x] **Phase 4: Database Foundation & Auth Core** - PostgreSQL schema, CORS fix, email/password auth, sessions, auth-gated feed, client-side routing (completed 2026-04-03)
 - [ ] **Phase 5: Google OAuth & Profile Page** - Google sign-in/connect, extensible OAuth framework, profile page with connected accounts, display name editing
 - [ ] **Phase 6: TikTok OAuth & Instagram Scaffold** - TikTok OAuth connect (staging/sandbox), Instagram OAuth scaffold with Professional-account messaging
 - [ ] **Phase 7: Email Delivery & Profile Completion** - Transactional email for verification + password reset, avatar management, account deletion
@@ -44,7 +44,7 @@ Plans:
 - [x] 04-01-PLAN.md — PostgreSQL + Drizzle ORM + better-auth backend infrastructure, Wave 0 test stubs
 - [x] 04-02-PLAN.md — CORS credentials fix, auth guards on feed/video, Vite proxy, frontend auth client, shared types
 - [x] 04-03-PLAN.md — Auth UI components, login/register/profile pages, React Router setup, ProtectedRoute, LogoutButton, 401 handler
-- [ ] 04-04-PLAN.md — Backend auth integration tests, end-to-end verification checkpoint
+- [x] 04-04-PLAN.md — Backend auth integration tests, end-to-end verification checkpoint
 **UI hint**: yes
 
 ### Phase 5: Google OAuth & Profile Page
@@ -92,7 +92,7 @@ Plans:
 | 1. Backend Foundation | v1.0 | 2/2 | Complete | 2026-04-01 |
 | 2. Video Player Core | v1.0 | 3/3 | Complete | 2026-04-02 |
 | 3. Feed & Navigation | v1.0 | 3/3 | Complete | 2026-04-02 |
-| 4. Database Foundation & Auth Core | v1.1 | 3/4 | In Progress|  |
+| 4. Database Foundation & Auth Core | v1.1 | 4/4 | Complete   | 2026-04-03 |
 | 5. Google OAuth & Profile Page | v1.1 | 0/? | Not started | - |
 | 6. TikTok OAuth & Instagram Scaffold | v1.1 | 0/? | Not started | - |
 | 7. Email Delivery & Profile Completion | v1.1 | 0/? | Not started | - |
