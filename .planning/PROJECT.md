@@ -28,12 +28,12 @@ A vertical-swipe video feed that plays content your friends chose to share — n
 **Goal:** Add user authentication (email/password + OAuth) with connected accounts architecture for TikTok, Google, and Instagram, gating the existing feed behind login.
 
 **Target features:**
-- Email/password registration and login
+- ✓ Email/password registration and login — Phase 4
+- ✓ Auth-gated feed (must be logged in to view) — Phase 4
+- ✓ PostgreSQL database for user/session/account storage — Phase 4
 - OAuth framework with real redirect flows for Google, TikTok, and Instagram
 - Connected accounts UI (link/unlink providers on profile)
 - Basic profile page (name, avatar, connected accounts list)
-- Auth-gated feed (must be logged in to view)
-- PostgreSQL database for user/session/account storage
 
 ### Out of Scope
 
@@ -51,7 +51,7 @@ A vertical-swipe video feed that plays content your friends chose to share — n
 Shipped v1.0 with 1,554 LOC TypeScript across 3 packages (shared, backend, frontend).
 Tech stack: React 19 + Vite 8 + Fastify 5 + Tailwind 4 + Swiper.js 11 + Zustand 5 + TanStack Query 5.
 pnpm monorepo with shared types package.
-79 tests (28 backend, 18 video player, 33 feed) all passing.
+Phase 4 complete — PostgreSQL + better-auth email/password auth + auth-gated feed + React Router + dark-themed auth UI.
 v1.1 adds PostgreSQL, user auth (email/password + OAuth), connected accounts architecture (Google, TikTok, Instagram), and basic profile page.
 OAuth flows are architectural — real redirects but no content pulling. TikTok/Instagram app review deferred.
 
@@ -74,6 +74,9 @@ OAuth flows are architectural — real redirects but no content pulling. TikTok/
 | Zustand over Redux | Minimal boilerplate for simple feed state (index, mute) | ✓ Good — clean global mute sync |
 | VideoStore abstraction | Cloud-swappable later without route handler changes | ⚠️ Revisit — @fastify/static bypasses store for streaming |
 | Static files for m1 | Simplify scope, focus on player UX | ✓ Good — DiskVideoStore + fixtures |
+| better-auth over passport | Single package replaces 4-5 deps, built-in Drizzle adapter, email/password + OAuth | ✓ Good — Phase 4 |
+| Drizzle ORM 0.45.x (not 1.0-beta) | v1.0-beta breaks better-auth adapter (issue #6766) | ✓ Good — stability over bleeding edge |
+| Database-backed sessions over JWTs | Server-side invalidation required for logout | ✓ Good — httpOnly cookies, 30-day expiry |
 | Mobile framework deferred | Research needed, not blocking m1 | — Pending |
 | No algorithm by design | Core product differentiator — friend-curated feed | — Pending |
 | resolveVideoUrl abstraction | Single function to swap local/cloud URLs | ✓ Good — clean separation |
@@ -97,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after v1.1 milestone start*
+*Last updated: 2026-04-03 after Phase 4 completion*
